@@ -1,7 +1,7 @@
 /**
  * GitHub GitLab Dark Theme & Groups Extension
  * @author vernonthedev
- * @description Transforms GitHub to GitLab's dark theme with intelligent repository grouping and dropdown management.
+ * @description Transforms GitHub to GitLab's dark theme with intelligent repository grouping and card-based management.
  */
 
 // Import Dexie for IndexedDB storage
@@ -15,21 +15,66 @@ class GitHubGitLabTheme {
     this.groups = new Map();
     this.customGroups = new Set();
     this.groupingEnabled = true;
-    this.darkMode = true; // Default to dark mode
+    this.darkMode = true; // Always dark mode
     this.db = null;
+    this.currentActiveGroup = null;
+    this.processedContainers = new Set();
     this.init();
   }
 
   async init() {
+    // Apply dark theme immediately to prevent flash
+    this.applyDarkTheme();
+    
     await this.initStorage();
     await this.loadSettings();
     
+    // Process immediately if DOM is ready
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => this.run());
     } else {
       this.run();
     }
+    
+    // Process again after a delay for dynamic content
     setTimeout(() => this.run(), 1000);
+    
+    // Listen for SPA navigation
+    this.setupNavigationListener();
+  }
+
+  setupNavigationListener() {
+    // Listen for URL changes (GitHub is an SPA)
+    let currentUrl = window.location.href;
+    new MutationObserver(() => {
+      if (window.location.href !== currentUrl) {
+        currentUrl = window.location.href;
+        console.log('[GitLab Theme] URL changed to:', currentUrl);
+        setTimeout(() => {
+          this.processedContainers.clear(); // Clear cache
+          this.run();
+        }, 500);
+      }
+    }).observe(document, { subtree: true, childList: true });
+  }
+
+  applyDarkTheme() {
+    // Apply dark theme immediately and ensure it stays applied
+    document.body.classList.add('gitlab-dark-theme');
+    
+    // Also apply to html element
+    document.documentElement.classList.add('gitlab-dark-theme');
+    
+    // Force dark mode with CSS if needed
+    if (!document.querySelector('#gitlab-dark-theme-forcer')) {
+      const style = document.createElement('style');
+      style.id = 'gitlab-dark-theme-forcer';
+      style.textContent = `
+        body, html { background-color: #0d0e11 !important; }
+        .gitlab-dark-theme { background-color: #0d0e11 !important; }
+      `;
+      document.head.appendChild(style);
+    }
   }
 
   async initStorage() {
@@ -122,16 +167,15 @@ class GitHubGitLabTheme {
   }
 
   async loadSettings() {
-    this.darkMode = await this.loadSetting('darkMode', true);
     this.groupingEnabled = await this.loadSetting('groupingEnabled', true);
     
     const customGroups = await this.loadSetting('customGroups', []);
     this.customGroups = new Set(customGroups);
     
-    console.log('[GitLab Theme] Settings loaded:', { darkMode: this.darkMode, groupingEnabled: this.groupingEnabled });
+    console.log('[GitLab Theme] Settings loaded:', { groupingEnabled: this.groupingEnabled });
     
-    // Apply theme immediately
-    this.applyTheme();
+    // Ensure dark theme is always applied
+    this.applyDarkTheme();
   }
 
   async saveCustomGroups() {
@@ -139,17 +183,15 @@ class GitHubGitLabTheme {
   }
 
   run() {
+    // Apply dark theme first
+    this.applyDarkTheme();
+    
+    // Setup observer for dynamic content
     this.setupMutationObserver();
+    
+    // Add controls and process repositories
     this.addGroupControls();
     this.processRepositories();
-  }
-
-  applyTheme() {
-    if (this.darkMode) {
-      document.body.classList.add('gitlab-dark-theme');
-    } else {
-      document.body.classList.remove('gitlab-dark-theme');
-    }
   }
 
   setupMutationObserver() {
@@ -169,8 +211,8 @@ class GitHubGitLabTheme {
       if (shouldProcess) {
         if (this.debounceTimer) clearTimeout(this.debounceTimer);
         this.debounceTimer = setTimeout(() => {
-          this.processRepositories();
           this.addGroupControls();
+          this.processRepositories();
         }, 300);
       }
     });
@@ -198,8 +240,9 @@ class GitHubGitLabTheme {
       try {
         const elements = document.querySelectorAll(selector);
         elements.forEach(el => {
-          if (el && !el.dataset.gitlabProcessed) {
+          if (el && !this.processedContainers.has(el)) {
             containers.push(el);
+            this.processedContainers.add(el);
           }
         });
       } catch (e) {
@@ -247,6 +290,9 @@ class GitHubGitLabTheme {
     this.isProcessing = true;
 
     try {
+      // Always apply dark theme
+      this.applyDarkTheme();
+      
       const containers = this.findRepositoryContainers();
       
       containers.forEach(container => {
@@ -254,7 +300,7 @@ class GitHubGitLabTheme {
         
         if (items.length > 0) {
           if (this.groupingEnabled) {
-            this.createDropdownGroups(container, items);
+            this.createGroupCards(container, items);
           } else {
             this.displayAllRepos(container, items);
           }
@@ -269,7 +315,7 @@ class GitHubGitLabTheme {
     }
   }
 
-  createDropdownGroups(container, items) {
+  createGroupCards(container, items) {
     const groups = this.extractGroups(items);
     
     if (groups.size <= 1) {
@@ -277,35 +323,27 @@ class GitHubGitLabTheme {
       return;
     }
 
+    // Clear existing content
+    container.innerHTML = '';
+    container.classList.add('gitlab-grouped-repositories');
+
     const fragment = document.createDocumentFragment();
     
-    // Create dropdown
-    const dropdownContainer = this.createGroupDropdown(groups, container);
-    fragment.appendChild(dropdownContainer);
+    // Create group cards section
+    const groupCardsSection = this.createGroupCardsSection(groups, container);
+    fragment.appendChild(groupCardsSection);
 
-    // Create repo container for filtered items
-    const repoContainer = document.createElement(container.tagName);
-    repoContainer.className = container.className;
-    repoContainer.classList.add('gitlab-filtered-repos');
-    repoContainer.style.cssText = container.style.cssText;
+    // Create hidden repo containers for each group
+    const repoContainersSection = this.createRepoContainers(groups, container);
+    fragment.appendChild(repoContainersSection);
 
-    items.forEach(item => {
-      repoContainer.appendChild(item);
-    });
-
-    fragment.appendChild(repoContainer);
-
-    // Preserve non-repo items
-    const nonRepoItems = Array.from(container.children).filter(child => 
-      !items.includes(child) && 
-      !child.classList.contains('gitlab-dropdown-section')
-    );
-
-    nonRepoItems.forEach(item => fragment.appendChild(item));
-
-    container.innerHTML = '';
     container.appendChild(fragment);
-    container.classList.add('gitlab-grouped-repositories');
+
+    // Show the first group by default
+    const firstGroup = Array.from(groups.keys())[0];
+    setTimeout(() => {
+      this.showGroupRepos(firstGroup, container);
+    }, 100);
   }
 
   extractGroups(items) {
@@ -324,55 +362,153 @@ class GitHubGitLabTheme {
     return groups;
   }
 
-  createGroupDropdown(groups, container) {
-    const dropdownSection = document.createElement('div');
-    dropdownSection.className = 'gitlab-dropdown-section';
+  createGroupCardsSection(groups, container) {
+    const section = document.createElement('div');
+    section.className = 'gitlab-cards-section';
 
-    const dropdownContainer = document.createElement('div');
-    dropdownContainer.className = 'gitlab-dropdown-container';
+    const containerDiv = document.createElement('div');
+    containerDiv.className = 'gitlab-group-cards-container';
 
-    const dropdown = document.createElement('select');
-    dropdown.className = 'gitlab-group-dropdown';
-    dropdown.innerHTML = `
-      <option value="all">All Repositories (${Array.from(groups.values()).flat().length})</option>
-      ${Array.from(groups.entries()).map(([name, items]) => 
-        `<option value="${name}">${name} (${items.length})</option>`
-      ).join('')}
-    `;
+    // Add "All Repositories" card
+    const allReposCard = this.createGroupCard('All Repositories', Array.from(groups.values()).flat(), 'all');
+    containerDiv.appendChild(allReposCard);
 
-    dropdown.addEventListener('change', (e) => {
-      this.filterRepositories(container, e.target.value, groups);
+    // Add group cards
+    Array.from(groups.entries()).forEach(([name, items]) => {
+      const card = this.createGroupCard(name, items, name);
+      containerDiv.appendChild(card);
     });
 
-    dropdownContainer.appendChild(dropdown);
-
-    const manageBtn = document.createElement('button');
-    manageBtn.className = 'gitlab-manage-dropdown-btn';
-    manageBtn.textContent = '⚙️';
-    manageBtn.title = 'Manage Groups';
-    manageBtn.onclick = () => this.showGroupManager();
-
-    dropdownContainer.appendChild(manageBtn);
-    dropdownSection.appendChild(dropdownContainer);
-
-    return dropdownSection;
+    section.appendChild(containerDiv);
+    return section;
   }
 
-  filterRepositories(container, selectedGroup, groups) {
-    const repoContainer = container.querySelector('.gitlab-filtered-repos');
-    if (!repoContainer) return;
+  createGroupCard(name, items, groupId) {
+    const card = document.createElement('div');
+    card.className = 'gitlab-group-card';
+    card.dataset.groupId = groupId;
 
-    const allItems = Array.from(groups.values()).flat();
+    const cardHeader = document.createElement('div');
+    cardHeader.className = 'gitlab-card-header';
+
+    const icon = document.createElement('div');
+    icon.className = 'gitlab-card-icon';
+    icon.innerHTML = this.getGroupIcon(name);
+
+    const titleCount = document.createElement('div');
+    titleCount.className = 'gitlab-card-title-count';
+
+    const title = document.createElement('h4');
+    title.className = 'gitlab-card-title';
+    title.textContent = name;
+
+    const count = document.createElement('span');
+    count.className = 'gitlab-card-count';
+    count.textContent = `${items.length}`;
+
+    titleCount.appendChild(title);
+    titleCount.appendChild(count);
     
-    allItems.forEach(item => {
-      if (selectedGroup === 'all') {
-        item.style.display = '';
-      } else {
-        const repoName = this.getRepositoryName(item);
-        const groupName = this.getGroupName(repoName);
-        item.style.display = groupName === selectedGroup ? '' : 'none';
+    cardHeader.appendChild(icon);
+    cardHeader.appendChild(titleCount);
+
+    card.appendChild(cardHeader);
+
+    // Make card clickable
+    card.style.cursor = 'pointer';
+    card.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log(`[GitLab Theme] Clicked group: ${groupId}`);
+      const parentContainer = card.closest('.gitlab-grouped-repositories');
+      if (parentContainer) {
+        this.showGroupRepos(groupId, parentContainer);
       }
     });
+
+    return card;
+  }
+
+  getGroupIcon(groupName) {
+    const iconMap = {
+      'All Repositories': '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>',
+      'General': '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="9"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>',
+      'Web': '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></svg>',
+      'Api': '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>',
+      'Mobile': '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>',
+      'Backend': '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>',
+      'Frontend': '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>',
+      'Default': '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>'
+    };
+
+    return iconMap[name] || iconMap['Default'];
+  }
+
+  createRepoContainers(groups, container) {
+    const section = document.createElement('div');
+    section.className = 'gitlab-repos-section';
+
+    // Create container for "All Repositories"
+    const allReposContainer = document.createElement(container.tagName);
+    allReposContainer.className = container.className;
+    allReposContainer.classList.add('gitlab-repo-container');
+    allReposContainer.dataset.groupId = 'all';
+    allReposContainer.style.display = 'none';
+
+    Array.from(groups.values()).flat().forEach(item => {
+      allReposContainer.appendChild(item.cloneNode(true));
+    });
+
+    section.appendChild(allReposContainer);
+
+    // Create containers for each group
+    Array.from(groups.entries()).forEach(([name, items]) => {
+      const groupContainer = document.createElement(container.tagName);
+      groupContainer.className = container.className;
+      groupContainer.classList.add('gitlab-repo-container');
+      groupContainer.dataset.groupId = name;
+      groupContainer.style.display = 'none';
+
+      items.forEach(item => {
+        groupContainer.appendChild(item);
+      });
+
+      section.appendChild(groupContainer);
+    });
+
+    return section;
+  }
+
+  showGroupRepos(groupId, container) {
+    console.log(`[GitLab Theme] Showing repos for group: ${groupId}`);
+    
+    // Hide all repo containers
+    const allContainers = container.querySelectorAll('.gitlab-repo-container');
+    allContainers.forEach(cont => {
+      cont.style.display = 'none';
+    });
+
+    // Show selected container
+    const selectedContainer = container.querySelector(`.gitlab-repo-container[data-group-id="${groupId}"]`);
+    if (selectedContainer) {
+      selectedContainer.style.display = '';
+      console.log(`[GitLab Theme] Found and showing container for ${groupId} with ${selectedContainer.children.length} items`);
+    } else {
+      console.error(`[GitLab Theme] Container not found for group: ${groupId}`);
+    }
+
+    // Update active card styling
+    const allCards = container.querySelectorAll('.gitlab-group-card');
+    allCards.forEach(card => {
+      card.classList.remove('active');
+    });
+
+    const activeCard = container.querySelector(`.gitlab-group-card[data-group-id="${groupId}"]`);
+    if (activeCard) {
+      activeCard.classList.add('active');
+    }
+
+    this.currentActiveGroup = groupId;
   }
 
   displayAllRepos(container, items) {
@@ -385,7 +521,8 @@ class GitHubGitLabTheme {
     // Preserve non-repo items
     const nonRepoItems = Array.from(container.children).filter(child => 
       !items.includes(child) && 
-      !child.classList.contains('gitlab-dropdown-section')
+      !child.classList.contains('gitlab-cards-section') &&
+      !child.classList.contains('gitlab-repos-section')
     );
 
     nonRepoItems.forEach(item => fragment.appendChild(item));
@@ -458,34 +595,24 @@ class GitHubGitLabTheme {
     const controls = document.createElement('div');
     controls.className = 'gitlab-group-controls';
 
-    const themeToggle = document.createElement('button');
-    themeToggle.className = 'gitlab-control-btn gitlab-theme-btn';
-    themeToggle.textContent = this.darkMode ? '🌞' : '🌙';
-    themeToggle.title = this.darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode';
-    themeToggle.onclick = async () => {
-      this.darkMode = !this.darkMode;
-      await this.saveSetting('darkMode', this.darkMode);
-      themeToggle.textContent = this.darkMode ? '🌞' : '🌙';
-      themeToggle.title = this.darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode';
-      this.applyTheme();
-    };
-
     const toggleGrouping = document.createElement('button');
     toggleGrouping.className = 'gitlab-control-btn';
-    toggleGrouping.textContent = this.groupingEnabled ? '📁 Disable Groups' : '📂 Enable Groups';
+    toggleGrouping.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg> Disable';
     toggleGrouping.onclick = async () => {
       this.groupingEnabled = !this.groupingEnabled;
       await this.saveSetting('groupingEnabled', this.groupingEnabled);
-      toggleGrouping.textContent = this.groupingEnabled ? '📁 Disable Groups' : '📂 Enable Groups';
+      toggleGrouping.innerHTML = this.groupingEnabled ? 
+        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg> Disable' : 
+        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg> Enable';
+      this.processedContainers.clear();
       this.processRepositories();
     };
 
     const manageGroups = document.createElement('button');
     manageGroups.className = 'gitlab-control-btn gitlab-manage-btn';
-    manageGroups.textContent = '⚙️ Manage Groups';
+    manageGroups.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M12 1v6m0 6v6m4.22-13.22l4.24 4.24M1.54 9.96l4.24 4.24M1 12h6m6 0h6"></path></svg> Manage';
     manageGroups.onclick = () => this.showGroupManager();
 
-    controls.appendChild(themeToggle);
     controls.appendChild(toggleGrouping);
     controls.appendChild(manageGroups);
 
@@ -503,7 +630,7 @@ class GitHubGitLabTheme {
     manager.className = 'gitlab-group-manager';
     manager.innerHTML = `
       <div class="gitlab-manager-content">
-        <h3>📁 Manage Repository Groups</h3>
+        <h3>Manage Repository Groups</h3>
         <div class="gitlab-manager-body">
           <div class="gitlab-group-list">
             <h4>Current Custom Groups</h4>
@@ -511,7 +638,7 @@ class GitHubGitLabTheme {
               ${Array.from(this.customGroups).map(group => `
                 <div class="gitlab-group-item">
                   <span>${group}</span>
-                  <button class="gitlab-remove-group" data-group="${group}">❌</button>
+                  <button class="gitlab-remove-group" data-group="${group}"></button>
                 </div>
               `).join('')}
               ${this.customGroups.size === 0 ? '<p class="gitlab-no-groups">No custom groups yet</p>' : ''}
@@ -520,11 +647,11 @@ class GitHubGitLabTheme {
           <div class="gitlab-add-group">
             <h4>Add New Group</h4>
             <input type="text" id="new-group-name" placeholder="Enter group name..." />
-            <button id="add-group-btn">➕ Add Group</button>
+            <button id="add-group-btn">Add Group</button>
           </div>
         </div>
         <div class="gitlab-manager-footer">
-          <button id="close-manager-btn">✅ Close</button>
+          <button id="close-manager-btn">Close</button>
         </div>
       </div>
     `;
@@ -542,6 +669,7 @@ class GitHubGitLabTheme {
         await this.saveCustomGroups();
         input.value = '';
         this.showGroupManager();
+        this.processedContainers.clear();
         this.processRepositories();
       }
     };
@@ -552,6 +680,7 @@ class GitHubGitLabTheme {
         this.customGroups.delete(group);
         await this.saveCustomGroups();
         this.showGroupManager();
+        this.processedContainers.clear();
         this.processRepositories();
       };
     });
@@ -564,4 +693,5 @@ class GitHubGitLabTheme {
   }
 }
 
+// Initialize the extension
 new GitHubGitLabTheme();
