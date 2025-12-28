@@ -1,0 +1,32 @@
+{
+  "manifest_version": 3,
+  "name": "GitHub Explorer2",
+  "version": "1.0.0",
+  "description": "Reskins GitHub.com to mimic GitLab's visual design and adding groups functionality to the setup",
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
+  "host_permissions": [
+    "https://github.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://github.com/*"
+      ],
+      "css": [
+        "styles.css"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}
