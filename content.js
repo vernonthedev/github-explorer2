@@ -341,9 +341,20 @@ class GitHubGitLabTheme {
 
     // Show the first group by default
     const firstGroup = Array.from(groups.keys())[0];
+    console.log(`[GitLab Theme] Auto-showing first group: ${firstGroup}`);
+    
+    // Wait a bit for DOM to settle, then simulate first group click
     setTimeout(() => {
-      this.showGroupRepos(firstGroup, container);
-    }, 100);
+      console.log(`[GitLab Theme] Attempting to show first group...`);
+      const firstCard = container.querySelector(`.gitlab-group-card[data-group-id="${firstGroup}"]`);
+      if (firstCard) {
+        console.log(`[GitLab Theme] Found first group card, simulating click`);
+        firstCard.click();
+      } else {
+        console.error(`[GitLab Theme] Could not find first group card: ${firstGroup}`);
+        console.log(`[GitLab Theme] Available cards:`, container.querySelectorAll('.gitlab-group-card'));
+      }
+    }, 200);
   }
 
   extractGroups(items) {
@@ -420,9 +431,25 @@ class GitHubGitLabTheme {
       e.preventDefault();
       e.stopPropagation();
       console.log(`[GitLab Theme] Clicked group: ${groupId}`);
-      const parentContainer = card.closest('.gitlab-grouped-repositories');
-      if (parentContainer) {
-        this.showGroupRepos(groupId, parentContainer);
+      console.log(`[GitLab Theme] Clicked card:`, card);
+      
+      // Find the grouped repositories container
+      const groupedContainer = card.closest('.gitlab-grouped-repositories') || 
+                            card.parentElement.closest('.gitlab-grouped-repositories') ||
+                            document.querySelector('.gitlab-grouped-repositories');
+      
+      console.log(`[GitLab Theme] Found grouped container:`, groupedContainer);
+      
+      if (groupedContainer) {
+        this.showGroupRepos(groupId, groupedContainer);
+      } else {
+        console.error(`[GitLab Theme] Could not find grouped repositories container`);
+        // Try to find any container with gitlab-grouped-repositories class
+        const allGroupedContainers = document.querySelectorAll('.gitlab-grouped-repositories');
+        console.log(`[GitLab Theme] Available grouped containers:`, allGroupedContainers);
+        if (allGroupedContainers.length > 0) {
+          this.showGroupRepos(groupId, allGroupedContainers[0]);
+        }
       }
     });
 
@@ -481,24 +508,48 @@ class GitHubGitLabTheme {
 
   showGroupRepos(groupId, container) {
     console.log(`[GitLab Theme] Showing repos for group: ${groupId}`);
+    console.log(`[GitLab Theme] Container:`, container);
+    
+    // Find the repos section within the grouped container
+    const reposSection = container.querySelector('.gitlab-repos-section');
+    console.log(`[GitLab Theme] Repos section:`, reposSection);
+    
+    if (!reposSection) {
+      console.error(`[GitLab Theme] Repos section not found!`);
+      return;
+    }
     
     // Hide all repo containers
-    const allContainers = container.querySelectorAll('.gitlab-repo-container');
-    allContainers.forEach(cont => {
+    const allContainers = reposSection.querySelectorAll('.gitlab-repo-container');
+    console.log(`[GitLab Theme] Found ${allContainers.length} repo containers:`, allContainers);
+    
+    allContainers.forEach((cont, index) => {
       cont.style.display = 'none';
+      console.log(`[GitLab Theme] Hiding container ${index} (data-group-id: ${cont.dataset.groupId})`);
     });
 
     // Show selected container
-    const selectedContainer = container.querySelector(`.gitlab-repo-container[data-group-id="${groupId}"]`);
+    const selectedContainer = reposSection.querySelector(`.gitlab-repo-container[data-group-id="${groupId}"]`);
     if (selectedContainer) {
-      selectedContainer.style.display = '';
+      selectedContainer.style.display = 'block';
       console.log(`[GitLab Theme] Found and showing container for ${groupId} with ${selectedContainer.children.length} items`);
+      console.log(`[GitLab Theme] Container children:`, selectedContainer.children);
+      
+      // Ensure repository items are visible
+      Array.from(selectedContainer.children).forEach((child, index) => {
+        child.style.display = '';
+        console.log(`[GitLab Theme] Making repo ${index} visible:`, child);
+      });
     } else {
       console.error(`[GitLab Theme] Container not found for group: ${groupId}`);
+      console.log(`[GitLab Theme] Available group IDs in repos section:`, 
+        Array.from(reposSection.querySelectorAll('.gitlab-repo-container')).map(c => c.dataset.groupId));
     }
 
     // Update active card styling
     const allCards = container.querySelectorAll('.gitlab-group-card');
+    console.log(`[GitLab Theme] Found ${allCards.length} group cards`);
+    
     allCards.forEach(card => {
       card.classList.remove('active');
     });
@@ -506,9 +557,15 @@ class GitHubGitLabTheme {
     const activeCard = container.querySelector(`.gitlab-group-card[data-group-id="${groupId}"]`);
     if (activeCard) {
       activeCard.classList.add('active');
+      console.log(`[GitLab Theme] Active card set for ${groupId}`);
+    } else {
+      console.error(`[GitLab Theme] Active card not found for group: ${groupId}`);
     }
 
     this.currentActiveGroup = groupId;
+    
+    // Scroll to the repos section
+    reposSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   displayAllRepos(container, items) {

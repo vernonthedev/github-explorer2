@@ -193,8 +193,23 @@ li[itemprop="owns"]:hover,
 
 .gitlab-group-card.active {
   border-color: var(--gl-primary) !important;
-  background: linear-gradient(135deg, rgba(252, 109, 38, 0.1), rgba(107, 79, 187, 0.1)) !important;
-  box-shadow: var(--gl-shadow-md) !important;
+  background: linear-gradient(135deg, rgba(252, 109, 38, 0.15), rgba(107, 79, 187, 0.15)) !important;
+  box-shadow: 0 0 0 2px rgba(252, 109, 38, 0.2) !important;
+  transform: translateY(-2px) scale(1.02) !important;
+}
+
+/* Enhanced active card visual feedback */
+.gitlab-group-card.active::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, var(--gl-primary), var(--gl-secondary));
+  border-radius: var(--gl-radius);
+  z-index: -1;
+  opacity: 0.1;
 }
 
 .gitlab-card-header {
