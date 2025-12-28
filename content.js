@@ -1,326 +1,567 @@
 /**
- * GitHub Explorer2
+ * GitHub GitLab Dark Theme & Groups Extension
  * @author vernonthedev
- * @version 1.0
- * 
- * This script reskins GitHub's interface to look like GitLab while preserving
- * all native functionality through careful DOM manipulation.
-
- * 
- * Key Design Principles:
- * 1. Never destroy and recreate DOM elements - always move existing nodes
- * 2. Use MutationObserver for SPA navigation detection
- * 3. Preserve React event listeners by maintaining original DOM structure
- * 4. Implement proper cleanup to prevent memory leaks
+ * @description Transforms GitHub to GitLab's dark theme with intelligent repository grouping and dropdown management.
  */
 
-class GitLabifier {
+// Import Dexie for IndexedDB storage
+const Dexie = window.Dexie;
+
+class GitHubGitLabTheme {
   constructor() {
     this.observer = null;
-    this.repoContainer = null;
     this.isProcessing = false;
+    this.debounceTimer = null;
+    this.groups = new Map();
+    this.customGroups = new Set();
+    this.groupingEnabled = true;
+    this.darkMode = true; // Default to dark mode
+    this.db = null;
     this.init();
   }
 
-  /**
-   * Initialize the GitLabifier
-   */
-  init() {
-    console.log('GitHub Explorer - GitLab Theme initialized');
-
-    // Wait for DOM to be ready
+  async init() {
+    await this.initStorage();
+    await this.loadSettings();
+    
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', () => this.setup());
+      document.addEventListener('DOMContentLoaded', () => this.run());
     } else {
-      this.setup();
+      this.run();
+    }
+    setTimeout(() => this.run(), 1000);
+  }
+
+  async initStorage() {
+    try {
+      // Initialize Dexie database
+      this.db = new Dexie('GitHubGitLabThemeDB');
+      this.db.version(1).stores({
+        settings: '++id, key, value',
+        groups: '++id, name, created'
+      });
+
+      console.log('[GitLab Theme] IndexedDB initialized successfully');
+    } catch (error) {
+      console.error('[GitLab Theme] Failed to initialize IndexedDB:', error);
+      this.initFallbackStorage();
     }
   }
 
-  /**
-   * Set up observers and initial processing
-   */
-  setup() {
+  initFallbackStorage() {
+    // Fallback to localStorage and cookies
+    console.log('[GitLab Theme] Using fallback storage');
+  }
+
+  async saveSetting(key, value) {
+    try {
+      if (this.db) {
+        await this.db.settings.where('key').equals(key).delete();
+        await this.db.settings.add({ key, value });
+      }
+      
+      // Fallback to localStorage
+      localStorage.setItem(`gitlab_theme_${key}`, JSON.stringify(value));
+      
+      // Fallback to cookie
+      this.setCookie(`gitlab_theme_${key}`, JSON.stringify(value), 365);
+      
+      console.log(`[GitLab Theme] Saved setting: ${key}`);
+    } catch (error) {
+      console.error('[GitLab Theme] Failed to save setting:', error);
+      this.saveSettingFallback(key, value);
+    }
+  }
+
+  async loadSetting(key, defaultValue = null) {
+    try {
+      if (this.db) {
+        const setting = await this.db.settings.where('key').equals(key).first();
+        if (setting) return setting.value;
+      }
+      
+      // Try localStorage
+      const localValue = localStorage.getItem(`gitlab_theme_${key}`);
+      if (localValue) return JSON.parse(localValue);
+      
+      // Try cookie
+      const cookieValue = this.getCookie(`gitlab_theme_${key}`);
+      if (cookieValue) return JSON.parse(cookieValue);
+      
+      return defaultValue;
+    } catch (error) {
+      console.error('[GitLab Theme] Failed to load setting:', error);
+      return defaultValue;
+    }
+  }
+
+  saveSettingFallback(key, value) {
+    try {
+      localStorage.setItem(`gitlab_theme_${key}`, JSON.stringify(value));
+      this.setCookie(`gitlab_theme_${key}`, JSON.stringify(value), 365);
+    } catch (error) {
+      console.error('[GitLab Theme] Fallback storage failed:', error);
+    }
+  }
+
+  setCookie(name, value, days) {
+    const expires = new Date();
+    expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
+    document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
+  }
+
+  getCookie(name) {
+    const nameEQ = name + "=";
+    const ca = document.cookie.split(';');
+    for(let i = 0; i < ca.length; i++) {
+      let c = ca[i];
+      while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+      if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+    }
+    return null;
+  }
+
+  async loadSettings() {
+    this.darkMode = await this.loadSetting('darkMode', true);
+    this.groupingEnabled = await this.loadSetting('groupingEnabled', true);
+    
+    const customGroups = await this.loadSetting('customGroups', []);
+    this.customGroups = new Set(customGroups);
+    
+    console.log('[GitLab Theme] Settings loaded:', { darkMode: this.darkMode, groupingEnabled: this.groupingEnabled });
+    
+    // Apply theme immediately
+    this.applyTheme();
+  }
+
+  async saveCustomGroups() {
+    await this.saveSetting('customGroups', Array.from(this.customGroups));
+  }
+
+  run() {
     this.setupMutationObserver();
+    this.addGroupControls();
     this.processRepositories();
   }
 
-  /**
-   * Set up MutationObserver to detect SPA navigation changes
-   * This is crucial for GitHub's React-based navigation
-   */
+  applyTheme() {
+    if (this.darkMode) {
+      document.body.classList.add('gitlab-dark-theme');
+    } else {
+      document.body.classList.remove('gitlab-dark-theme');
+    }
+  }
+
   setupMutationObserver() {
-    // Observe the entire body for DOM changes
+    if (this.observer) this.observer.disconnect();
+
     this.observer = new MutationObserver((mutations) => {
-      // Debounce rapid mutations to prevent performance issues
       if (this.isProcessing) return;
 
       let shouldProcess = false;
-
-      mutations.forEach((mutation) => {
-        // Check if repository-related elements were added
-        const addedNodes = Array.from(mutation.addedNodes);
-
-        if (addedNodes.some(node => {
-          // Check if the node or its children contain repository lists
-          return node.nodeType === Node.ELEMENT_NODE && (
-            node.matches?.('[data-testid="repository-list-item"]') ||
-            node.matches?.('#user-repositories-list') ||
-            node.querySelector?.('[data-testid="repository-list-item"]') ||
-            node.querySelector?.('#user-repositories-list')
-          );
-        })) {
+      for (const mutation of mutations) {
+        if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
           shouldProcess = true;
+          break;
         }
-      });
+      }
 
       if (shouldProcess) {
-        // Debounce the processing to handle rapid mutations
-        setTimeout(() => this.processRepositories(), 100);
+        if (this.debounceTimer) clearTimeout(this.debounceTimer);
+        this.debounceTimer = setTimeout(() => {
+          this.processRepositories();
+          this.addGroupControls();
+        }, 300);
       }
     });
 
-    // Start observing with configuration for performance
     this.observer.observe(document.body, {
       childList: true,
-      subtree: true,
-      attributes: false, // Don't observe attributes for better performance
-      characterData: false // Don't observe text changes
+      subtree: true
     });
   }
 
-  /**
-   * Find and process repository containers
-   */
+  findRepositoryContainers() {
+    const selectors = [
+      '#user-repositories-list',
+      '#org-repositories-list', 
+      '[data-testid="repository-list-container"]',
+      '.repo-list',
+      '[data-filterable-for="your-repos-filter"]',
+      '.js-repo-list',
+      'ul[data-test-selector="profile-repository-list"]',
+      'div[aria-label="Repositories"]'
+    ];
+
+    const containers = [];
+    selectors.forEach(selector => {
+      try {
+        const elements = document.querySelectorAll(selector);
+        elements.forEach(el => {
+          if (el && !el.dataset.gitlabProcessed) {
+            containers.push(el);
+          }
+        });
+      } catch (e) {
+        console.warn(`[GitLab Theme] Invalid selector: ${selector}`);
+      }
+    });
+
+    return containers;
+  }
+
+  findRepositoryItems(container) {
+    const itemSelectors = [
+      '[itemprop="owns"]',
+      '[data-testid="repository-list-item"]',
+      '.repo-list-item',
+      '.public',
+      '.private',
+      '.source',
+      '.fork',
+      '.archived',
+      'li[itemprop="owns"]',
+      'div[data-testid="repository-item"]'
+    ];
+
+    let items = [];
+    itemSelectors.forEach(selector => {
+      try {
+        const found = container.querySelectorAll(selector);
+        found.forEach(item => {
+          const nameElement = item.querySelector('h3 a, a[itemprop="name codeRepository"], .wb-break-all a, [data-testid="repository-name"]');
+          if (nameElement && !items.includes(item)) {
+            items.push(item);
+          }
+        });
+      } catch (e) {
+        console.warn(`[GitLab Theme] Invalid item selector: ${selector}`);
+      }
+    });
+
+    return items;
+  }
+
   processRepositories() {
     if (this.isProcessing) return;
     this.isProcessing = true;
 
     try {
-      // Multiple selectors to catch GitHub's various container patterns
-      const possibleSelectors = [
-        '#user-repositories-list',
-        '[data-filterable-for="your-repos-filter"]',
-        '.repo-list',
-        '[data-testid="repository-list"]'
-      ];
-
-      for (const selector of possibleSelectors) {
-        const container = document.querySelector(selector);
-        if (container && !container.dataset.processed) {
-          this.repoContainer = container;
-          this.groupRepositories(container);
-          break; // Process only the first found container
+      const containers = this.findRepositoryContainers();
+      
+      containers.forEach(container => {
+        const items = this.findRepositoryItems(container);
+        
+        if (items.length > 0) {
+          if (this.groupingEnabled) {
+            this.createDropdownGroups(container, items);
+          } else {
+            this.displayAllRepos(container, items);
+          }
+          container.dataset.gitlabProcessed = 'true';
         }
-      }
-    } catch (error) {
-      console.error('Error processing repositories:', error);
+      });
+
+    } catch (e) {
+      console.error('[GitLab Theme] Error processing repositories:', e);
     } finally {
       this.isProcessing = false;
     }
   }
 
-  /**
-   * Group repositories by naming convention
-   * Logic: Everything before the first hyphen (-) is the group name
-   * If no hyphen exists, group as "General"
-   * 
-   * @param {HTMLElement} container - The repository list container
-   */
-  groupRepositories(container) {
-    const repoItems = this.findRepositoryItems(container);
-
-    if (repoItems.length === 0) {
-      container.dataset.processed = 'true';
+  createDropdownGroups(container, items) {
+    const groups = this.extractGroups(items);
+    
+    if (groups.size <= 1) {
+      this.displayAllRepos(container, items);
       return;
     }
 
-    // Group repositories by naming convention
-    const groups = this.extractGroups(repoItems);
+    const fragment = document.createDocumentFragment();
+    
+    // Create dropdown
+    const dropdownContainer = this.createGroupDropdown(groups, container);
+    fragment.appendChild(dropdownContainer);
 
-    // Clear container but preserve original structure
-    while (container.firstChild) {
-      container.removeChild(container.firstChild);
-    }
+    // Create repo container for filtered items
+    const repoContainer = document.createElement(container.tagName);
+    repoContainer.className = container.className;
+    repoContainer.classList.add('gitlab-filtered-repos');
+    repoContainer.style.cssText = container.style.cssText;
 
-    // Rebuild container with grouped structure
-    Object.entries(groups).sort().forEach(([groupName, repos]) => {
-      const groupElement = this.createGroupElement(groupName, repos);
-      container.appendChild(groupElement);
+    items.forEach(item => {
+      repoContainer.appendChild(item);
     });
 
-    // Mark as processed to prevent infinite loops
-    container.dataset.processed = 'true';
+    fragment.appendChild(repoContainer);
+
+    // Preserve non-repo items
+    const nonRepoItems = Array.from(container.children).filter(child => 
+      !items.includes(child) && 
+      !child.classList.contains('gitlab-dropdown-section')
+    );
+
+    nonRepoItems.forEach(item => fragment.appendChild(item));
+
+    container.innerHTML = '';
+    container.appendChild(fragment);
+    container.classList.add('gitlab-grouped-repositories');
   }
 
-  /**
-   * Find all repository items within a container
-   * Uses multiple selectors to handle GitHub's varying DOM structure
-   * 
-   * @param {HTMLElement} container - The container to search within
-   * @returns {HTMLElement[]} Array of repository elements
-   */
-  findRepositoryItems(container) {
-    const selectors = [
-      '[data-testid="repository-list-item"]',
-      '.public',
-      '.Private',
-      '.repo-list-item'
-    ];
+  extractGroups(items) {
+    const groups = new Map();
 
-    const items = [];
+    items.forEach(item => {
+      const repoName = this.getRepositoryName(item);
+      const groupName = this.getGroupName(repoName);
 
-    selectors.forEach(selector => {
-      const elements = Array.from(container.querySelectorAll(selector));
-      items.push(...elements);
-    });
-
-    // Remove duplicates and filter valid items
-    return [...new Set(items)].filter(item => {
-      // Ensure the item has a repository name
-      const nameLink = item.querySelector('a[href*="/"]');
-      return nameLink && nameLink.textContent.trim();
-    });
-  }
-
-  /**
-   * Extract groups from repository items based on naming convention
-   * 
-   * @param {HTMLElement[]} repoItems - Array of repository elements
-   * @returns {Object} Groups object with group names as keys
-   */
-  extractGroups(repoItems) {
-    const groups = {};
-
-    repoItems.forEach(item => {
-      const nameLink = item.querySelector('a[href*="/"]');
-      if (!nameLink) return;
-
-      const repoName = nameLink.textContent.trim();
-      const groupName = this.extractGroupName(repoName);
-
-      if (!groups[groupName]) {
-        groups[groupName] = [];
+      if (!groups.has(groupName)) {
+        groups.set(groupName, []);
       }
-
-      // CRITICAL: Move the existing DOM node, don't recreate it
-      // This preserves all React event listeners and functionality
-      groups[groupName].push(item);
+      groups.get(groupName).push(item);
     });
 
     return groups;
   }
 
-  /**
-   * Extract group name from repository name
-   * Logic: Everything before the first hyphen (-) is the group name
-   * If no hyphen exists, use "General"
-   * 
-   * @param {string} repoName - The repository name
-   * @returns {string} The group name
-   */
-  extractGroupName(repoName) {
-    const hyphenIndex = repoName.indexOf('-');
+  createGroupDropdown(groups, container) {
+    const dropdownSection = document.createElement('div');
+    dropdownSection.className = 'gitlab-dropdown-section';
 
-    if (hyphenIndex > 0) {
-      // Return text before first hyphen, trim whitespace
-      return repoName.substring(0, hyphenIndex).trim();
+    const dropdownContainer = document.createElement('div');
+    dropdownContainer.className = 'gitlab-dropdown-container';
+
+    const dropdown = document.createElement('select');
+    dropdown.className = 'gitlab-group-dropdown';
+    dropdown.innerHTML = `
+      <option value="all">All Repositories (${Array.from(groups.values()).flat().length})</option>
+      ${Array.from(groups.entries()).map(([name, items]) => 
+        `<option value="${name}">${name} (${items.length})</option>`
+      ).join('')}
+    `;
+
+    dropdown.addEventListener('change', (e) => {
+      this.filterRepositories(container, e.target.value, groups);
+    });
+
+    dropdownContainer.appendChild(dropdown);
+
+    const manageBtn = document.createElement('button');
+    manageBtn.className = 'gitlab-manage-dropdown-btn';
+    manageBtn.textContent = '⚙️';
+    manageBtn.title = 'Manage Groups';
+    manageBtn.onclick = () => this.showGroupManager();
+
+    dropdownContainer.appendChild(manageBtn);
+    dropdownSection.appendChild(dropdownContainer);
+
+    return dropdownSection;
+  }
+
+  filterRepositories(container, selectedGroup, groups) {
+    const repoContainer = container.querySelector('.gitlab-filtered-repos');
+    if (!repoContainer) return;
+
+    const allItems = Array.from(groups.values()).flat();
+    
+    allItems.forEach(item => {
+      if (selectedGroup === 'all') {
+        item.style.display = '';
+      } else {
+        const repoName = this.getRepositoryName(item);
+        const groupName = this.getGroupName(repoName);
+        item.style.display = groupName === selectedGroup ? '' : 'none';
+      }
+    });
+  }
+
+  displayAllRepos(container, items) {
+    const fragment = document.createDocumentFragment();
+    
+    items.forEach(item => {
+      fragment.appendChild(item);
+    });
+
+    // Preserve non-repo items
+    const nonRepoItems = Array.from(container.children).filter(child => 
+      !items.includes(child) && 
+      !child.classList.contains('gitlab-dropdown-section')
+    );
+
+    nonRepoItems.forEach(item => fragment.appendChild(item));
+
+    container.innerHTML = '';
+    container.appendChild(fragment);
+  }
+
+  getRepositoryName(item) {
+    const nameSelectors = [
+      'h3 a',
+      'a[itemprop="name codeRepository"]',
+      '.wb-break-all a',
+      '[data-testid="repository-name"]'
+    ];
+
+    for (const selector of nameSelectors) {
+      const element = item.querySelector(selector);
+      if (element) {
+        return element.textContent.trim();
+      }
+    }
+    return '';
+  }
+
+  getGroupName(repoName) {
+    if (!repoName) return 'General';
+    
+    for (const customGroup of this.customGroups) {
+      if (repoName.toLowerCase().startsWith(customGroup.toLowerCase())) {
+        return customGroup;
+      }
+    }
+
+    const separators = ['-', '_', '/', '.', ' '];
+    for (const sep of separators) {
+      const index = repoName.indexOf(sep);
+      if (index > 0) {
+        const prefix = repoName.substring(0, index).toLowerCase();
+        if (prefix.length >= 2) {
+          return prefix.charAt(0).toUpperCase() + prefix.slice(1);
+        }
+      }
     }
 
     return 'General';
   }
 
-  /**
-   * Create a group element with header and container
-   * 
-   * @param {string} groupName - The name of the group
-   * @param {HTMLElement[]} repositories - Array of repository elements
-   * @returns {HTMLElement} Complete group element
-   */
-  createGroupElement(groupName, repositories) {
-    // Create group fragment for efficient DOM manipulation
-    const fragment = document.createDocumentFragment();
+  addGroupControls() {
+    const existingControls = document.querySelector('.gitlab-group-controls');
+    if (existingControls) return;
 
-    // Create group header
-    const header = document.createElement('div');
-    header.className = 'repo-group-header';
-    header.textContent = groupName;
-    fragment.appendChild(header);
+    const repoSections = [
+      '#user-repositories-list',
+      '#org-repositories-list',
+      '[data-testid="repository-list-container"]'
+    ];
 
-    // Create group container for repositories
-    const container = document.createElement('div');
-    container.className = 'repo-group-container';
-
-    // CRITICAL: Move existing DOM nodes, don't clone or recreate
-    // This preserves GitHub's React functionality and event listeners
-    repositories.forEach(repo => {
-      // Remove from current position before appending
-      if (repo.parentNode) {
-        repo.parentNode.removeChild(repo);
+    for (const selector of repoSections) {
+      const container = document.querySelector(selector);
+      if (container && !container.previousElementSibling?.classList.contains('gitlab-group-controls')) {
+        const controls = this.createGroupControls();
+        container.parentNode.insertBefore(controls, container);
+        break;
       }
-      container.appendChild(repo);
-    });
-
-    fragment.appendChild(container);
-    return fragment;
+    }
   }
 
-  /**
-   * Clean up resources when the extension is disabled
-   */
-  destroy() {
-    if (this.observer) {
-      this.observer.disconnect();
-      this.observer = null;
+  createGroupControls() {
+    const controls = document.createElement('div');
+    controls.className = 'gitlab-group-controls';
+
+    const themeToggle = document.createElement('button');
+    themeToggle.className = 'gitlab-control-btn gitlab-theme-btn';
+    themeToggle.textContent = this.darkMode ? '🌞' : '🌙';
+    themeToggle.title = this.darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode';
+    themeToggle.onclick = async () => {
+      this.darkMode = !this.darkMode;
+      await this.saveSetting('darkMode', this.darkMode);
+      themeToggle.textContent = this.darkMode ? '🌞' : '🌙';
+      themeToggle.title = this.darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode';
+      this.applyTheme();
+    };
+
+    const toggleGrouping = document.createElement('button');
+    toggleGrouping.className = 'gitlab-control-btn';
+    toggleGrouping.textContent = this.groupingEnabled ? '📁 Disable Groups' : '📂 Enable Groups';
+    toggleGrouping.onclick = async () => {
+      this.groupingEnabled = !this.groupingEnabled;
+      await this.saveSetting('groupingEnabled', this.groupingEnabled);
+      toggleGrouping.textContent = this.groupingEnabled ? '📁 Disable Groups' : '📂 Enable Groups';
+      this.processRepositories();
+    };
+
+    const manageGroups = document.createElement('button');
+    manageGroups.className = 'gitlab-control-btn gitlab-manage-btn';
+    manageGroups.textContent = '⚙️ Manage Groups';
+    manageGroups.onclick = () => this.showGroupManager();
+
+    controls.appendChild(themeToggle);
+    controls.appendChild(toggleGrouping);
+    controls.appendChild(manageGroups);
+
+    return controls;
+  }
+
+  showGroupManager() {
+    const existing = document.querySelector('.gitlab-group-manager');
+    if (existing) {
+      existing.remove();
+      return;
     }
 
-    // Remove processed markers to allow reprocessing
-    document.querySelectorAll('[data-processed]').forEach(el => {
-      delete el.dataset.processed;
+    const manager = document.createElement('div');
+    manager.className = 'gitlab-group-manager';
+    manager.innerHTML = `
+      <div class="gitlab-manager-content">
+        <h3>📁 Manage Repository Groups</h3>
+        <div class="gitlab-manager-body">
+          <div class="gitlab-group-list">
+            <h4>Current Custom Groups</h4>
+            <div id="custom-groups-list">
+              ${Array.from(this.customGroups).map(group => `
+                <div class="gitlab-group-item">
+                  <span>${group}</span>
+                  <button class="gitlab-remove-group" data-group="${group}">❌</button>
+                </div>
+              `).join('')}
+              ${this.customGroups.size === 0 ? '<p class="gitlab-no-groups">No custom groups yet</p>' : ''}
+            </div>
+          </div>
+          <div class="gitlab-add-group">
+            <h4>Add New Group</h4>
+            <input type="text" id="new-group-name" placeholder="Enter group name..." />
+            <button id="add-group-btn">➕ Add Group</button>
+          </div>
+        </div>
+        <div class="gitlab-manager-footer">
+          <button id="close-manager-btn">✅ Close</button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(manager);
+
+    document.getElementById('close-manager-btn').onclick = () => manager.remove();
+    
+    document.getElementById('add-group-btn').onclick = async () => {
+      const input = document.getElementById('new-group-name');
+      const groupName = input.value.trim();
+      
+      if (groupName && !this.customGroups.has(groupName)) {
+        this.customGroups.add(groupName);
+        await this.saveCustomGroups();
+        input.value = '';
+        this.showGroupManager();
+        this.processRepositories();
+      }
+    };
+
+    document.querySelectorAll('.gitlab-remove-group').forEach(btn => {
+      btn.onclick = async () => {
+        const group = btn.dataset.group;
+        this.customGroups.delete(group);
+        await this.saveCustomGroups();
+        this.showGroupManager();
+        this.processRepositories();
+      };
     });
+
+    manager.onclick = (e) => {
+      if (e.target === manager) {
+        manager.remove();
+      }
+    };
   }
 }
 
-// Initialize the extension when the script loads
-// Use a self-executing function to avoid global namespace pollution
-(() => {
-  let gitLabifier = null;
-
-  // Initialize on first load
-  const initExtension = () => {
-    if (!gitLabifier) {
-      gitLabifier = new GitLabifier();
-    }
-  };
-
-  // Clean up when page unloads
-  const cleanup = () => {
-    if (gitLabifier) {
-      gitLabifier.destroy();
-      gitLabifier = null;
-    }
-  };
-
-  // Initialize immediately if DOM is ready, otherwise wait
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initExtension);
-  } else {
-    initExtension();
-  }
-
-  // Clean up on page unload
-  window.addEventListener('beforeunload', cleanup);
-
-  // Also handle GitHub's SPA navigation by observing URL changes
-  let lastUrl = location.href;
-  new MutationObserver(() => {
-    if (location.href !== lastUrl) {
-      lastUrl = location.href;
-      // Debounce URL change processing
-      setTimeout(() => {
-        if (gitLabifier) {
-          gitLabifier.processRepositories();
-        }
-      }, 500);
-    }
-  }).observe(document, { subtree: true, childList: true });
-})();
+new GitHubGitLabTheme();

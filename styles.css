@@ -1,235 +1,603 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,100..1000&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
-/* ===== GitLab Color Palette ===== */
 :root {
-  --gitlab-navy: #292961;
-  --gitlab-orange: #e24329;
-  --gitlab-orange-hover: #d33c25;
-  --gitlab-off-white: #fdfdfd;
-  --gitlab-white: #ffffff;
-  --gitlab-border: #dbdbdb;
-  --gitlab-text-primary: #303030;
-  --gitlab-text-secondary: #666;
-  --gitlab-muted: #868686;
-  --gitlab-background-gray: #f5f5f5;
+  --gl-primary: #fc6d26;
+  --gl-primary-dark: #e54b26;
+  --gl-secondary: #6b4fbb;
+  --gl-secondary-dark: #5a3ea5;
+  --gl-white: #ffffff;
+  --gl-gray-10: #fafafa;
+  --gl-gray-50: #f5f5f5;
+  --gl-gray-100: #ededed;
+  --gl-gray-200: #e0e0e0;
+  --gl-gray-300: #d1d1d1;
+  --gl-gray-400: #bfbfbf;
+  --gl-gray-500: #868686;
+  --gl-gray-600: #666666;
+  --gl-gray-700: #333333;
+  --gl-gray-900: #1f1e24;
+  --gl-border: var(--gl-gray-200);
+  --gl-font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --gl-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --gl-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --gl-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --gl-shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.1);
+  --gl-radius-full: 50px;
+  --gl-transition: all 0.2s ease-in-out;
 }
 
-/* ===== Typography ===== */
+/* Dark Theme Variables */
+.gitlab-dark-theme {
+  --gl-white: #1f1e24;
+  --gl-gray-10: #0d0e11;
+  --gl-gray-50: #1f1e24;
+  --gl-gray-100: #2e2e37;
+  --gl-gray-200: #3d3d47;
+  --gl-gray-300: #4e4e5e;
+  --gl-gray-400: #6e6e84;
+  --gl-gray-500: #8e8ea0;
+  --gl-gray-600: #aeaebe;
+  --gl-gray-700: #ceced9;
+  --gl-border: var(--gl-gray-200);
+  --gl-primary: #fc6d26;
+  --gl-secondary: #6b4fbb;
+}
+
+* {
+  box-sizing: border-box;
+}
+
 body {
-  font-family: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif !important;
+  font-family: var(--gl-font) !important;
+  background-color: var(--gl-gray-10) !important;
+  color: var(--gl-gray-700) !important;
+  line-height: 1.6 !important;
+  transition: var(--gl-transition);
 }
 
-/* ===== Header Reskin ===== */
-.Header,
-header[role="banner"],
-.Header-old {
-  background-color: var(--gitlab-navy) !important;
-  border-bottom: 1px solid var(--gitlab-border) !important;
+/* Dark Theme Background */
+.gitlab-dark-theme {
+  background-color: var(--gl-gray-10) !important;
 }
 
-.Header-link,
-.HeaderMenu-link,
-.header-nav-link {
-  color: var(--gitlab-white) !important;
-  font-weight: 500 !important;
+.gitlab-dark-theme body {
+  background-color: var(--gl-gray-10) !important;
+  color: var(--gl-gray-700) !important;
 }
 
-.Header-link:hover,
-.HeaderMenu-link:hover,
-.header-nav-link:hover {
-  color: var(--gitlab-off-white) !important;
-  background-color: rgba(255, 255, 255, 0.1) !important;
+/* Header - Dark Theme */
+.gitlab-dark-theme header[role="banner"],
+.gitlab-dark-theme .Header,
+.gitlab-dark-theme .js-header-wrapper {
+  background-color: var(--gl-gray-50) !important;
+  border-bottom: 1px solid var(--gl-border) !important;
 }
 
-/* Hide GitHub-specific header clutter */
-.Header-search--focus {
-  border-color: var(--gitlab-border) !important;
+.gitlab-dark-theme .Header-link,
+.gitlab-dark-theme .header-nav-link,
+.gitlab-dark-theme .HeaderMenu-link {
+  color: var(--gl-gray-700) !important;
 }
 
-.search-input-container {
-  background-color: rgba(255, 255, 255, 0.1) !important;
-  border: 1px solid var(--gitlab-border) !important;
+.gitlab-dark-theme .Header-link:hover,
+.gitlab-dark-theme .header-nav-link:hover,
+.gitlab-dark-theme .HeaderMenu-link:hover {
+  color: var(--gl-primary) !important;
 }
 
-/* ===== Repository List Reskin ===== */
-#user-repositories-list,
-.repo-list,
-[data-filterable-for="your-repos-filter"] {
-  background: var(--gitlab-white) !important;
-  border: 1px solid var(--gitlab-border) !important;
-  border-radius: 4px !important;
-}
-
-/* Repository list items - GitLab style */
+/* Repository List Items - GitLab Style with Dark Support */
 .repo-list-item,
-.public,
-.Private,
-[data-testid="repository-list-item"] {
-  border-bottom: 1px solid var(--gitlab-border) !important;
+li[itemprop="owns"],
+[data-testid="repository-list-item"],
+.org-repo {
+  background: var(--gl-white) !important;
+  border: 1px solid var(--gl-border) !important;
+  border-radius: var(--gl-radius-full) !important;
   padding: 16px 20px !important;
-  width: 100% !important;
-  display: flex !important;
-  align-items: center !important;
-  background: var(--gitlab-white) !important;
-  margin: 0 !important;
-  border-radius: 0 !important;
-  transition: background-color 0.15s ease !important;
+  margin-bottom: 8px !important;
+  transition: var(--gl-transition) !important;
+  box-shadow: var(--gl-shadow-sm) !important;
+  position: relative !important;
 }
 
 .repo-list-item:hover,
-.public:hover,
-.Private:hover,
-[data-testid="repository-list-item"]:hover {
-  background-color: var(--gitlab-background-gray) !important;
+li[itemprop="owns"]:hover,
+[data-testid="repository-list-item"]:hover,
+.org-repo:hover {
+  border-color: var(--gl-primary) !important;
+  box-shadow: var(--gl-shadow) !important;
+  transform: translateY(-1px) !important;
+  background: var(--gl-gray-50) !important;
 }
 
-.repo-list-item:last-child,
-.public:last-child,
-.Private:last-child,
-[data-testid="repository-list-item"]:last-child {
-  border-bottom: none !important;
-}
-
-/* Repository names and descriptions */
-.repo-list-item a,
-.f4 {
-  color: var(--gitlab-text-primary) !important;
+.repo-list-item h3 a,
+.wb-break-all a,
+[data-testid="repository-list-item"] a[href*="/"] {
+  color: var(--gl-gray-700) !important;
   font-weight: 600 !important;
   font-size: 16px !important;
+  text-decoration: none !important;
+  transition: var(--gl-transition) !important;
 }
 
-.repo-list-item a:hover,
-.f4:hover {
-  color: var(--gitlab-orange) !important;
+.repo-list-item h3 a:hover,
+.wb-break-all a:hover,
+[data-testid="repository-list-item"] a[href*="/"]:hover {
+  color: var(--gl-primary) !important;
 }
 
-.p-small,
-.text-gray,
-.mt-1 {
-  color: var(--gitlab-text-secondary) !important;
+/* GitLab Dropdown System */
+.gitlab-dropdown-section {
+  margin-bottom: 20px !important;
+  background: var(--gl-white) !important;
+  border-radius: var(--gl-radius-full) !important;
+  padding: 16px 20px !important;
+  border: 1px solid var(--gl-border) !important;
+  box-shadow: var(--gl-shadow-sm) !important;
+}
+
+.gitlab-dropdown-container {
+  display: flex !important;
+  gap: 12px !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+}
+
+.gitlab-group-dropdown {
+  background: var(--gl-white) !important;
+  border: 1px solid var(--gl-border) !important;
+  border-radius: var(--gl-radius-full) !important;
+  color: var(--gl-gray-700) !important;
+  padding: 10px 16px !important;
   font-size: 14px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: var(--gl-transition) !important;
+  font-family: var(--gl-font) !important;
+  min-width: 200px !important;
+  outline: none !important;
 }
 
-/* Hide GitHub visual noise */
-.repo-list-item .mt-2,
-.repo-list-item .f6,
-.repo-list-item .labels,
-.repo-list-item .Counter,
-.js-repo-stats {
-  display: none !important;
+.gitlab-group-dropdown:focus {
+  border-color: var(--gl-primary) !important;
+  box-shadow: 0 0 0 3px rgba(252, 109, 38, 0.1) !important;
 }
 
-/* ===== Group Headers (Generated by content.js) ===== */
-.repo-group-header {
-  background-color: var(--gitlab-background-gray) !important;
-  border-bottom: 2px solid var(--gitlab-border) !important;
+.gitlab-dark-theme .gitlab-group-dropdown {
+  background: var(--gl-gray-50) !important;
+  color: var(--gl-gray-700) !important;
+}
+
+.gitlab-dark-theme .gitlab-group-dropdown:focus {
+  border-color: var(--gl-primary) !important;
+}
+
+/* Group Controls - Fully Rounded Buttons */
+.gitlab-group-controls {
+  display: flex !important;
+  gap: 12px !important;
+  margin-bottom: 16px !important;
+  padding: 16px 20px !important;
+  background: var(--gl-white) !important;
+  border-radius: var(--gl-radius-full) !important;
+  border: 1px solid var(--gl-border) !important;
+  align-items: center !important;
+  box-shadow: var(--gl-shadow-sm) !important;
+  flex-wrap: wrap !important;
+}
+
+.gitlab-control-btn {
+  background: var(--gl-white) !important;
+  border: 1px solid var(--gl-border) !important;
+  color: var(--gl-gray-700) !important;
+  padding: 10px 20px !important;
+  border-radius: var(--gl-radius-full) !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: var(--gl-transition) !important;
+  font-family: var(--gl-font) !important;
+  font-size: 14px !important;
+  outline: none !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  min-width: fit-content !important;
+}
+
+.gitlab-control-btn:hover {
+  background: var(--gl-gray-50) !important;
+  border-color: var(--gl-primary) !important;
+  color: var(--gl-primary) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: var(--gl-shadow) !important;
+}
+
+.gitlab-theme-btn {
+  background: linear-gradient(135deg, var(--gl-primary), var(--gl-secondary)) !important;
+  border: none !important;
+  color: var(--gl-white) !important;
+  font-size: 16px !important;
+  padding: 10px 16px !important;
+  min-width: 44px !important;
+  justify-content: center !important;
+}
+
+.gitlab-theme-btn:hover {
+  background: linear-gradient(135deg, var(--gl-primary-dark), var(--gl-secondary-dark)) !important;
+  color: var(--gl-white) !important;
+  transform: translateY(-2px) scale(1.05) !important;
+  box-shadow: var(--gl-shadow-md) !important;
+}
+
+.gitlab-manage-btn {
+  background: var(--gl-primary) !important;
+  border-color: var(--gl-primary) !important;
+  color: var(--gl-white) !important;
+}
+
+.gitlab-manage-btn:hover {
+  background: var(--gl-primary-dark) !important;
+  border-color: var(--gl-primary-dark) !important;
+  color: var(--gl-white) !important;
+}
+
+.gitlab-manage-dropdown-btn {
+  background: var(--gl-secondary) !important;
+  border: none !important;
+  color: var(--gl-white) !important;
+  font-size: 14px !important;
+  padding: 8px 12px !important;
+  border-radius: var(--gl-radius-full) !important;
+  cursor: pointer !important;
+  transition: var(--gl-transition) !important;
+  outline: none !important;
+}
+
+.gitlab-manage-dropdown-btn:hover {
+  background: var(--gl-secondary-dark) !important;
+  transform: scale(1.1) !important;
+}
+
+/* Group Manager Modal - Dark Theme Support */
+.gitlab-group-manager {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  background: rgba(0, 0, 0, 0.6) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  z-index: 9999 !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+.gitlab-manager-content {
+  background: var(--gl-white) !important;
+  border-radius: 20px !important;
+  box-shadow: var(--gl-shadow-lg) !important;
+  max-width: 500px !important;
+  width: 90% !important;
+  max-height: 80vh !important;
+  overflow-y: auto !important;
+  border: 1px solid var(--gl-border) !important;
+}
+
+.gitlab-manager-content h3 {
+  margin: 0 !important;
+  padding: 24px 24px 20px !important;
+  border-bottom: 1px solid var(--gl-border) !important;
+  color: var(--gl-gray-700) !important;
+  font-size: 18px !important;
+  font-weight: 600 !important;
+  background: linear-gradient(135deg, rgba(252, 109, 38, 0.1), rgba(107, 79, 187, 0.1)) !important;
+}
+
+.gitlab-manager-body {
+  padding: 24px !important;
+}
+
+.gitlab-group-list h4,
+.gitlab-add-group h4 {
+  margin: 0 0 16px 0 !important;
+  color: var(--gl-gray-700) !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+}
+
+.gitlab-group-item {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: 12px 16px !important;
+  background: var(--gl-gray-50) !important;
+  border-radius: var(--gl-radius-full) !important;
+  margin-bottom: 8px !important;
+  border: 1px solid var(--gl-border) !important;
+  transition: var(--gl-transition) !important;
+}
+
+.gitlab-group-item:hover {
+  background: var(--gl-gray-100) !important;
+  transform: translateX(4px) !important;
+}
+
+.gitlab-remove-group {
+  background: #ff4757 !important;
+  border: none !important;
+  color: var(--gl-white) !important;
+  width: 28px !important;
+  height: 28px !important;
+  border-radius: 50% !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-weight: bold !important;
+  font-size: 12px !important;
+  transition: var(--gl-transition) !important;
+  outline: none !important;
+}
+
+.gitlab-remove-group:hover {
+  background: #ff3838 !important;
+  transform: scale(1.2) !important;
+  box-shadow: var(--gl-shadow) !important;
+}
+
+.gitlab-no-groups {
+  color: var(--gl-gray-500) !important;
+  font-style: italic !important;
+  text-align: center !important;
+  padding: 20px !important;
+  background: var(--gl-gray-50) !important;
+  border-radius: var(--gl-radius-full) !important;
+  border: 1px dashed var(--gl-border) !important;
+}
+
+#new-group-name {
+  width: 100% !important;
+  padding: 12px 16px !important;
+  border: 1px solid var(--gl-border) !important;
+  border-radius: var(--gl-radius-full) !important;
+  font-size: 14px !important;
+  margin-bottom: 12px !important;
+  font-family: var(--gl-font) !important;
+  transition: var(--gl-transition) !important;
+  background: var(--gl-white) !important;
+  color: var(--gl-gray-700) !important;
+  outline: none !important;
+}
+
+#new-group-name:focus {
+  border-color: var(--gl-primary) !important;
+  box-shadow: 0 0 0 3px rgba(252, 109, 38, 0.1) !important;
+}
+
+.gitlab-dark-theme #new-group-name {
+  background: var(--gl-gray-50) !important;
+  color: var(--gl-gray-700) !important;
+}
+
+#add-group-btn {
+  background: linear-gradient(135deg, var(--gl-primary), var(--gl-secondary)) !important;
+  border: none !important;
+  color: var(--gl-white) !important;
   padding: 12px 20px !important;
-  font-weight: 700 !important;
-  color: var(--gitlab-text-primary) !important;
+  border-radius: var(--gl-radius-full) !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: var(--gl-transition) !important;
+  font-family: var(--gl-font) !important;
   font-size: 14px !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.5px !important;
+  outline: none !important;
+  width: 100% !important;
 }
 
-.repo-group-container {
-  border-bottom: 1px solid var(--gitlab-border) !important;
-  background: var(--gitlab-white) !important;
+#add-group-btn:hover {
+  background: linear-gradient(135deg, var(--gl-primary-dark), var(--gl-secondary-dark)) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: var(--gl-shadow) !important;
 }
 
-.repo-group-container:last-child {
-  border-bottom: none !important;
+.gitlab-manager-footer {
+  padding: 20px 24px !important;
+  border-top: 1px solid var(--gl-border) !important;
+  text-align: right !important;
+  background: var(--gl-gray-50) !important;
 }
 
-/* ===== Buttons and Actions ===== */
+#close-manager-btn {
+  background: linear-gradient(135deg, #00d2d3, #54a0ff) !important;
+  border: none !important;
+  color: var(--gl-white) !important;
+  padding: 12px 24px !important;
+  border-radius: var(--gl-radius-full) !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: var(--gl-transition) !important;
+  font-family: var(--gl-font) !important;
+  font-size: 14px !important;
+  outline: none !important;
+}
+
+#close-manager-btn:hover {
+  background: linear-gradient(135deg, #00b8b9, #4a90e2) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: var(--gl-shadow) !important;
+}
+
+/* Buttons - Fully Rounded GitLab Style */
 .btn-primary,
 .Button--primary {
-  background-color: var(--gitlab-orange) !important;
-  border-color: var(--gitlab-orange) !important;
-  color: var(--gitlab-white) !important;
+  background: var(--gl-primary) !important;
+  border: none !important;
+  color: var(--gl-white) !important;
+  border-radius: var(--gl-radius-full) !important;
+  font-weight: 500 !important;
+  transition: var(--gl-transition) !important;
+  padding: 8px 16px !important;
 }
 
 .btn-primary:hover,
 .Button--primary:hover {
-  background-color: var(--gitlab-orange-hover) !important;
-  border-color: var(--gitlab-orange-hover) !important;
+  background: var(--gl-primary-dark) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: var(--gl-shadow) !important;
 }
 
-.btn-secondary,
-.Button--secondary {
-  background-color: var(--gitlab-white) !important;
-  border-color: var(--gitlab-border) !important;
-  color: var(--gitlab-text-primary) !important;
+.btn,
+.Button {
+  border-radius: var(--gl-radius-full) !important;
+  font-weight: 500 !important;
+  transition: var(--gl-transition) !important;
+  outline: none !important;
 }
 
-.btn-secondary:hover,
-.Button--secondary:hover {
-  background-color: var(--gitlab-background-gray) !important;
-  border-color: var(--gitlab-border) !important;
+/* Navigation & Layout - Dark Theme Support */
+.application-main,
+.env-production {
+  background: var(--gl-gray-10) !important;
 }
 
-/* ===== Navigation and Sidebars ===== */
-.menu-item,
-.SideNav-item {
-  border-left: 3px solid transparent !important;
+.gitlab-dark-theme .application-main,
+.gitlab-dark-theme .env-production {
+  background: var(--gl-gray-10) !important;
 }
 
-.menu-item.selected,
-.SideNav-item.selected {
-  background-color: var(--gitlab-background-gray) !important;
-  border-left-color: var(--gitlab-orange) !important;
+/* Page Headers - Dark Theme */
+.pagehead {
+  border-bottom: 1px solid var(--gl-border) !important;
+  background: var(--gl-white) !important;
 }
 
-.menu-item a,
-.SideNav-item a {
-  color: var(--gitlab-text-primary) !important;
+.gitlab-dark-theme .pagehead {
+  background: var(--gl-white) !important;
 }
 
-.menu-item a:hover,
-.SideNav-item a:hover {
-  color: var(--gitlab-orange) !important;
-  background-color: var(--gitlab-background-gray) !important;
+/* Tabs & Navigation - Dark Theme */
+.tabnav {
+  border-bottom: 1px solid var(--gl-border) !important;
+  background: var(--gl-white) !important;
 }
 
-/* ===== General Layout Improvements ===== */
-.container,
-.application-main {
-  background-color: var(--gitlab-off-white) !important;
+.gitlab-dark-theme .tabnav {
+  background: var(--gl-white) !important;
 }
 
-.Box,
-.Box-header {
-  border-color: var(--gitlab-border) !important;
-  background-color: var(--gitlab-white) !important;
+.tabnav-tab {
+  color: var(--gl-gray-600) !important;
+  border-bottom: 2px solid transparent !important;
+  transition: var(--gl-transition) !important;
+  border-radius: var(--gl-radius-full) var(--gl-radius-full) 0 0 !important;
+  margin-right: 4px !important;
 }
 
-/* ===== Contribution Graph (Minimize Visual Noise) ===== */
-.contribution-graph,
-.js-calendar-graph,
+.tabnav-tab:hover {
+  color: var(--gl-primary) !important;
+  border-bottom-color: var(--gl-primary) !important;
+}
+
+.tabnav-tab.selected {
+  color: var(--gl-primary) !important;
+  border-bottom-color: var(--gl-primary) !important;
+  background: var(--gl-gray-50) !important;
+}
+
+/* Search & Filters - Dark Theme */
+.subnav-search {
+  border: 1px solid var(--gl-border) !important;
+  border-radius: var(--gl-radius-full) !important;
+  background: var(--gl-white) !important;
+  color: var(--gl-gray-700) !important;
+}
+
+.subnav-search:focus {
+  border-color: var(--gl-primary) !important;
+  box-shadow: 0 0 0 3px rgba(252, 109, 38, 0.1) !important;
+}
+
+.gitlab-dark-theme .subnav-search {
+  background: var(--gl-gray-50) !important;
+  color: var(--gl-gray-700) !important;
+}
+
+/* Badges & Labels - Dark Theme */
+.Label,
+.topic-tag {
+  border-radius: var(--gl-radius-full) !important;
+  background: var(--gl-gray-100) !important;
+  color: var(--gl-gray-600) !important;
+  border: 1px solid var(--gl-border) !important;
+  font-weight: 500 !important;
+  font-size: 12px !important;
+  padding: 4px 12px !important;
+}
+
+/* Pinned Items - Dark Theme */
+.pinned-item-list-item {
+  border: 1px solid var(--gl-border) !important;
+  border-radius: var(--gl-radius-full) !important;
+  background: var(--gl-white) !important;
+  transition: var(--gl-transition) !important;
+}
+
+.pinned-item-list-item:hover {
+  border-color: var(--gl-primary) !important;
+  box-shadow: var(--gl-shadow) !important;
+  background: var(--gl-gray-50) !important;
+}
+
+/* Repository Stats */
+.f6.text-gray.mt-2,
+.repo-list-stat {
+  color: var(--gl-gray-500) !important;
+  font-size: 14px !important;
+}
+
+/* Contribution Graph - Dark Theme Subtle */
+.js-calendar-graph-svg,
 .ContributionCalendar {
-  opacity: 0.3 !important;
+  opacity: 0.2 !important;
+  filter: grayscale(100%) !important;
+  transition: var(--gl-transition) !important;
 }
 
-/* ===== Responsive Design ===== */
-@media (max-width: 768px) {
+.js-calendar-graph-svg:hover,
+.ContributionCalendar:hover {
+  opacity: 0.4 !important;
+  filter: grayscale(50%) !important;
+}
 
+/* Responsive Design */
+@media (max-width: 768px) {
+  .gitlab-group-controls {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  
+  .gitlab-dropdown-container {
+    flex-direction: column !important;
+  }
+  
+  .gitlab-group-dropdown {
+    width: 100% !important;
+  }
+  
+  .gitlab-manager-content {
+    width: 95% !important;
+    margin: 20px !important;
+  }
+  
   .repo-list-item,
-  .public,
-  .Private,
+  li[itemprop="owns"],
   [data-testid="repository-list-item"] {
     padding: 12px 16px !important;
   }
-
-  .repo-group-header {
-    padding: 10px 16px !important;
+  
+  .gitlab-control-btn {
+    padding: 12px 16px !important;
+    font-size: 16px !important;
   }
-}
-
-/* ===== Smooth Transitions ===== */
-.repo-list-item,
-.public,
-.Private,
-[data-testid="repository-list-item"],
-.btn-primary,
-.btn-secondary {
-  transition: all 0.2s ease !important;
 }

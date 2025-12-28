@@ -12,5 +12,9 @@
   },
   "scripts": {
     "prepare": "husky"
+  },
+  "dependencies": {
+    "dexie": "^4.2.1",
+    "lucide-static": "^0.562.0"
   }
 }
