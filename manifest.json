@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "GitHub Explorer2",
-  "version": "1.0.0",
-  "description": "Reskins GitHub.com to mimic GitLab's visual design and adding groups functionality to the setup",
+  "name": "GitHub GitLab Dark Theme & Groups",
+  "version": "3.0.0",
+  "description": "Transform GitHub to GitLab's dark theme with intelligent repository grouping and dropdown management",
   "permissions": [
     "activeTab",
     "storage"
@@ -19,9 +19,16 @@
         "styles.css"
       ],
       "js": [
+        "node_modules/dexie/dist/dexie.min.js",
         "content.js"
       ],
       "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["node_modules/dexie/dist/dexie.min.js"],
+      "matches": ["https://github.com/*"]
     }
   ],
   "icons": {
