@@ -186,6 +186,15 @@ class GitHubGitLabTheme {
     // Apply dark theme first
     this.applyDarkTheme();
     
+    // Check if we're on an organization page for debugging
+    const isOrgPage = window.location.pathname.includes('/orgs/') || 
+                      window.location.pathname.match(/^\/[^\/]+$/) && 
+                      document.querySelector('[data-test-selector="org-header"]');
+    
+    if (isOrgPage) {
+      console.log('[GitLab Theme] Organization page detected');
+    }
+    
     // Setup observer for dynamic content
     this.setupMutationObserver();
     
@@ -230,9 +239,16 @@ class GitHubGitLabTheme {
       '[data-testid="repository-list-container"]',
       '.repo-list',
       '[data-filterable-for="your-repos-filter"]',
+      '[data-filterable-for="org-repos-filter"]',
       '.js-repo-list',
       'ul[data-test-selector="profile-repository-list"]',
-      'div[aria-label="Repositories"]'
+      'div[aria-label="Repositories"]',
+      // Org page specific selectors
+      'div[data-test-selector="org-repositories-list"]',
+      '.org-repos',
+      '#org-repositories',
+      '[data-test-selector="org-repo-list"]',
+      'div[data-target="org-repositories.repositoryList"]'
     ];
 
     const containers = [];
@@ -250,6 +266,38 @@ class GitHubGitLabTheme {
       }
     });
 
+    // If no containers found with specific selectors, try broader search
+    if (containers.length === 0) {
+      console.log('[GitLab Theme] No specific containers found, trying broader search');
+      
+      // Look for any list containing repository links
+      const repoLinks = document.querySelectorAll('a[href*="/"][href*="/"]');
+      if (repoLinks.length > 0) {
+        // Find common parents of repo links that might be containers
+        const potentialContainers = new Set();
+        repoLinks.forEach(link => {
+          if (link.href.match(/github\.com\/[^\/]+\/[^\/]+\/?$/)) {
+            let parent = link.parentElement;
+            while (parent && parent !== document.body) {
+              if (parent.children.length > 1) {
+                potentialContainers.add(parent);
+                break;
+              }
+              parent = parent.parentElement;
+            }
+          }
+        });
+        
+        potentialContainers.forEach(container => {
+          if (!this.processedContainers.has(container)) {
+            containers.push(container);
+            this.processedContainers.add(container);
+          }
+        });
+      }
+    }
+
+    console.log(`[GitLab Theme] Found ${containers.length} repository containers`);
     return containers;
   }
 
@@ -264,7 +312,13 @@ class GitHubGitLabTheme {
       '.fork',
       '.archived',
       'li[itemprop="owns"]',
-      'div[data-testid="repository-item"]'
+      'div[data-testid="repository-item"]',
+      // Org page specific selectors
+      'li[data-test-selector="repository-list-item"]',
+      'div[data-test-selector="repository-list-item"]',
+      '.Box-row', // GitHub uses Box-row for repo items on org pages
+      'li[itemprop="codeRepository"]',
+      'div[itemprop="codeRepository"]'
     ];
 
     let items = [];
@@ -272,7 +326,7 @@ class GitHubGitLabTheme {
       try {
         const found = container.querySelectorAll(selector);
         found.forEach(item => {
-          const nameElement = item.querySelector('h3 a, a[itemprop="name codeRepository"], .wb-break-all a, [data-testid="repository-name"]');
+          const nameElement = item.querySelector('h3 a, a[itemprop="name codeRepository"], .wb-break-all a, [data-testid="repository-name"], [itemprop="name"], .Link--primary');
           if (nameElement && !items.includes(item)) {
             items.push(item);
           }
@@ -593,12 +647,15 @@ class GitHubGitLabTheme {
       'h3 a',
       'a[itemprop="name codeRepository"]',
       '.wb-break-all a',
-      '[data-testid="repository-name"]'
+      '[data-testid="repository-name"]',
+      '[itemprop="name"]',
+      '.Link--primary',
+      'a[href*="/"][title]'
     ];
 
     for (const selector of nameSelectors) {
       const element = item.querySelector(selector);
-      if (element) {
+      if (element && element.textContent.trim()) {
         return element.textContent.trim();
       }
     }
@@ -635,7 +692,10 @@ class GitHubGitLabTheme {
     const repoSections = [
       '#user-repositories-list',
       '#org-repositories-list',
-      '[data-testid="repository-list-container"]'
+      '[data-testid="repository-list-container"]',
+      'div[data-test-selector="org-repositories-list"]',
+      '.org-repos',
+      '#org-repositories'
     ];
 
     for (const selector of repoSections) {
