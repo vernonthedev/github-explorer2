@@ -2,7 +2,7 @@
  * Navigation Manager - Handles SPA navigation and page changes.
  */
 
-export class NavigationManager {
+class NavigationManager {
   /**
    * Create navigation manager instance.
    * @param {Function} onNavigationChange - Navigation change handler.
@@ -59,3 +59,5 @@ export class NavigationManager {
     return this.currentUrl;
   }
 }
+
+module.exports = NavigationManager;

@@ -2,7 +2,7 @@
  * Group Card Component - Creates and manages group card UI elements.
  */
 
-export class GroupCard {
+class GroupCard {
   /**
    * Create group card instance.
    * @param {string} name - Group name.
@@ -110,3 +110,5 @@ export class GroupCard {
     return iconMap[groupName] || iconMap['Default'];
   }
 }
+
+module.exports = GroupCard;

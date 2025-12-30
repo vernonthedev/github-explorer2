@@ -2,19 +2,34 @@
  * Extension Entry Points.
  */
 
-export { default as GitHubGitLabTheme } from './main.js';
+const GitHubGitLabTheme = require('./main.js');
 
-export { StorageManager } from './storage/StorageManager.js';
-export { ThemeManager } from './core/theme/ThemeManager.js';
+const StorageManager = require('./storage/StorageManager.js');
+const ThemeManager = require('./core/theme/ThemeManager.js');
 
-export { RepositoryFinder } from './core/repository/RepositoryFinder.js';
-export { GroupManager } from './core/repository/GroupManager.js';
-export { RepositoryProcessor } from './core/repository/RepositoryProcessor.js';
-export { GroupDisplayManager } from './core/repository/GroupDisplayManager.js';
+const RepositoryFinder = require('./core/repository/RepositoryFinder.js');
+const GroupManager = require('./core/repository/GroupManager.js');
+const RepositoryProcessor = require('./core/repository/RepositoryProcessor.js');
+const GroupDisplayManager = require('./core/repository/GroupDisplayManager.js');
 
-export { GroupCard } from './ui/components/GroupCard.js';
-export { GroupControls } from './ui/components/GroupControls.js';
-export { GroupManagerModal } from './ui/managers/GroupManagerModal.js';
+const GroupCard = require('./ui/components/GroupCard.js');
+const GroupControls = require('./ui/components/GroupControls.js');
+const GroupManagerModal = require('./ui/managers/GroupManagerModal.js');
 
-export { PageDetector } from './utils/PageDetector.js';
-export { NavigationManager } from './utils/NavigationManager.js';
+const PageDetector = require('./utils/PageDetector.js');
+const NavigationManager = require('./utils/NavigationManager.js');
+
+module.exports = {
+  GitHubGitLabTheme,
+  StorageManager,
+  ThemeManager,
+  RepositoryFinder,
+  GroupManager,
+  RepositoryProcessor,
+  GroupDisplayManager,
+  GroupCard,
+  GroupControls,
+  GroupManagerModal,
+  PageDetector,
+  NavigationManager
+};

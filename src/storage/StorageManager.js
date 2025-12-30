@@ -2,7 +2,7 @@
  * Storage Manager - Handles all data persistence operations.
  */
 
-export class StorageManager {
+class StorageManager {
   constructor() {
     this.db = null;
     this.isInitialized = false;
@@ -139,3 +139,5 @@ export class StorageManager {
     return null;
   }
 }
+
+module.exports = StorageManager;

@@ -2,7 +2,7 @@
  * Page Detector - Determines if current page is a repository page.
  */
 
-export class PageDetector {
+class PageDetector {
   /**
    * Check if current page is a repository listing page.
    * @returns {boolean} True if repository page.
@@ -63,3 +63,5 @@ export class PageDetector {
     return 'other';
   }
 }
+
+module.exports = PageDetector;

@@ -2,7 +2,7 @@
  * Group Controls Component - Creates controls for managing groups.
  */
 
-export class GroupControls {
+class GroupControls {
   /**
    * Create group controls instance.
    * @param {Function} onToggleGrouping - Toggle grouping handler.
@@ -86,3 +86,5 @@ export class GroupControls {
     this.groupingEnabled = enabled;
   }
 }
+
+module.exports = GroupControls;

@@ -2,7 +2,7 @@
  * Group Manager - Handles repository grouping logic.
  */
 
-export class GroupManager {
+class GroupManager {
   constructor(customGroups = new Set()) {
     this.customGroups = customGroups;
   }
@@ -109,3 +109,5 @@ export class GroupManager {
     this.customGroups = new Set(newGroups);
   }
 }
+
+module.exports = GroupManager;

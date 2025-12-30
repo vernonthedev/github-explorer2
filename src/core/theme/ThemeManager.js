@@ -2,7 +2,7 @@
  * Theme Manager - Handles dark theme application and management.
  */
 
-export class ThemeManager {
+class ThemeManager {
   constructor() {
     this.isDarkMode = true;
   }
@@ -57,3 +57,5 @@ export class ThemeManager {
     this.isDarkMode = !this.isDarkMode;
   }
 }
+
+module.exports = ThemeManager;

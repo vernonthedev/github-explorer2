@@ -2,7 +2,7 @@
  * Repository Finder - Locates and validates repository containers and items.
  */
 
-export class RepositoryFinder {
+class RepositoryFinder {
   constructor() {
     this.processedContainers = new Set();
   }
@@ -128,3 +128,5 @@ export class RepositoryFinder {
     this.processedContainers.clear();
   }
 }
+
+module.exports = RepositoryFinder;

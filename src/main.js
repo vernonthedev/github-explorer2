@@ -4,16 +4,16 @@
  * @description Transforms GitHub to GitLab's dark theme with intelligent repository grouping and card-based management.
  */
 
-import { StorageManager } from './storage/StorageManager.js';
-import { ThemeManager } from './core/theme/ThemeManager.js';
-import { PageDetector } from './utils/PageDetector.js';
-import { NavigationManager } from './utils/NavigationManager.js';
-import { RepositoryFinder } from './core/repository/RepositoryFinder.js';
-import { GroupManager } from './core/repository/GroupManager.js';
-import { RepositoryProcessor } from './core/repository/RepositoryProcessor.js';
-import { GroupDisplayManager } from './core/repository/GroupDisplayManager.js';
-import { GroupControls } from './ui/components/GroupControls.js';
-import { GroupManagerModal } from './ui/managers/GroupManagerModal.js';
+const StorageManager = require('./storage/StorageManager.js');
+const ThemeManager = require('./core/theme/ThemeManager.js');
+const PageDetector = require('./utils/PageDetector.js');
+const NavigationManager = require('./utils/NavigationManager.js');
+const RepositoryFinder = require('./core/repository/RepositoryFinder.js');
+const GroupManager = require('./core/repository/GroupManager.js');
+const RepositoryProcessor = require('./core/repository/RepositoryProcessor.js');
+const GroupDisplayManager = require('./core/repository/GroupDisplayManager.js');
+const GroupControls = require('./ui/components/GroupControls.js');
+const GroupManagerModal = require('./ui/managers/GroupManagerModal.js');
 
 /**
  * Main extension class that orchestrates all functionality.
@@ -324,4 +324,8 @@ class GitHubGitLabTheme {
   }
 }
 
-new GitHubGitLabTheme();
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = GitHubGitLabTheme;
+} else {
+  new GitHubGitLabTheme();
+}

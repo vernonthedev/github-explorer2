@@ -162,8 +162,12 @@ export class RepositoryProcessor {
       }
     }, 200);
   }
-}
 
+  /**
+   * Create group cards for displaying repositories.
+   * @param {Element} container - Container element.
+   * @param {Array} items - Repository items.
+   */
   createGroupCards(container, items) {
     const groups = this.groupManager.extractGroups(items);
     
@@ -302,3 +306,5 @@ export class RepositoryProcessor {
     }, 200);
   }
 }
+
+module.exports = RepositoryProcessor;
