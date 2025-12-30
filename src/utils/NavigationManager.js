@@ -1,20 +1,29 @@
 /**
- * Navigation Manager - Handles SPA navigation and page changes
+ * Navigation Manager - Handles SPA navigation and page changes.
  */
 
 export class NavigationManager {
+  /**
+   * Create navigation manager instance.
+   * @param {Function} onNavigationChange - Navigation change handler.
+   */
   constructor(onNavigationChange) {
     this.onNavigationChange = onNavigationChange;
     this.currentUrl = window.location.href;
     this.observer = null;
   }
 
+  /**
+   * Initialize navigation manager.
+   */
   init() {
     this.setupNavigationListener();
   }
 
+  /**
+   * Setup navigation listener for SPA changes.
+   */
   setupNavigationListener() {
-    // Listen for URL changes (GitHub is an SPA)
     this.observer = new MutationObserver(() => {
       if (window.location.href !== this.currentUrl) {
         this.currentUrl = window.location.href;
@@ -32,6 +41,9 @@ export class NavigationManager {
     });
   }
 
+  /**
+   * Destroy navigation manager and cleanup listeners.
+   */
   destroy() {
     if (this.observer) {
       this.observer.disconnect();
@@ -39,6 +51,10 @@ export class NavigationManager {
     }
   }
 
+  /**
+   * Get current URL.
+   * @returns {string} Current URL.
+   */
   getCurrentUrl() {
     return this.currentUrl;
   }

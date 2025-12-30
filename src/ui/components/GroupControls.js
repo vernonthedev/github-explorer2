@@ -1,14 +1,24 @@
 /**
- * Group Controls Component - Creates controls for managing groups
+ * Group Controls Component - Creates controls for managing groups.
  */
 
 export class GroupControls {
+  /**
+   * Create group controls instance.
+   * @param {Function} onToggleGrouping - Toggle grouping handler.
+   * @param {Function} onManageGroups - Manage groups handler.
+   * @param {boolean} groupingEnabled - Current grouping status.
+   */
   constructor(onToggleGrouping, onManageGroups, groupingEnabled = true) {
     this.onToggleGrouping = onToggleGrouping;
     this.onManageGroups = onManageGroups;
     this.groupingEnabled = groupingEnabled;
   }
 
+  /**
+   * Create controls DOM element.
+   * @returns {Element} Controls element.
+   */
   create() {
     const controls = document.createElement('div');
     controls.className = 'gitlab-group-controls';
@@ -22,6 +32,10 @@ export class GroupControls {
     return controls;
   }
 
+  /**
+   * Create toggle button.
+   * @returns {Element} Toggle button element.
+   */
   createToggleButton() {
     const button = document.createElement('button');
     button.className = 'gitlab-control-btn';
@@ -36,6 +50,10 @@ export class GroupControls {
     return button;
   }
 
+  /**
+   * Update toggle button appearance.
+   * @param {Element} button - Button element to update.
+   */
   updateToggleButton(button) {
     if (this.groupingEnabled) {
       button.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg> Disable';
@@ -44,6 +62,10 @@ export class GroupControls {
     }
   }
 
+  /**
+   * Create manage button.
+   * @returns {Element} Manage button element.
+   */
   createManageButton() {
     const button = document.createElement('button');
     button.className = 'gitlab-control-btn gitlab-manage-btn';
@@ -56,6 +78,10 @@ export class GroupControls {
     return button;
   }
 
+  /**
+   * Update grouping status.
+   * @param {boolean} enabled - New grouping status.
+   */
   updateGroupingStatus(enabled) {
     this.groupingEnabled = enabled;
   }

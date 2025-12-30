@@ -1,8 +1,15 @@
 /**
- * Group Card Component - Creates and manages group card UI elements
+ * Group Card Component - Creates and manages group card UI elements.
  */
 
 export class GroupCard {
+  /**
+   * Create group card instance.
+   * @param {string} name - Group name.
+   * @param {Element[]} items - Repository items in this group.
+   * @param {string} groupId - Unique group identifier.
+   * @param {Function} onCardClick - Click handler function.
+   */
   constructor(name, items, groupId, onCardClick) {
     this.name = name;
     this.items = items;
@@ -10,6 +17,10 @@ export class GroupCard {
     this.onCardClick = onCardClick;
   }
 
+  /**
+   * Create group card DOM element.
+   * @returns {Element} Group card element.
+   */
   create() {
     const card = document.createElement('div');
     card.className = 'gitlab-group-card';
@@ -18,7 +29,6 @@ export class GroupCard {
     const cardHeader = this.createCardHeader();
     card.appendChild(cardHeader);
 
-    // Make card clickable
     card.style.cursor = 'pointer';
     card.addEventListener('click', (e) => {
       e.preventDefault();
@@ -30,6 +40,10 @@ export class GroupCard {
     return card;
   }
 
+  /**
+   * Create card header element.
+   * @returns {Element} Card header element.
+   */
   createCardHeader() {
     const cardHeader = document.createElement('div');
     cardHeader.className = 'gitlab-card-header';
@@ -43,6 +57,10 @@ export class GroupCard {
     return cardHeader;
   }
 
+  /**
+   * Create icon element.
+   * @returns {Element} Icon element.
+   */
   createIcon() {
     const icon = document.createElement('div');
     icon.className = 'gitlab-card-icon';
@@ -50,6 +68,10 @@ export class GroupCard {
     return icon;
   }
 
+  /**
+   * Create title and count element.
+   * @returns {Element} Title count element.
+   */
   createTitleCount() {
     const titleCount = document.createElement('div');
     titleCount.className = 'gitlab-card-title-count';
@@ -68,6 +90,11 @@ export class GroupCard {
     return titleCount;
   }
 
+  /**
+   * Get icon SVG for group name.
+   * @param {string} groupName - Group name.
+   * @returns {string} SVG icon HTML.
+   */
   getGroupIcon(groupName) {
     const iconMap = {
       'All Repositories': '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>',

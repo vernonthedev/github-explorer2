@@ -1,5 +1,5 @@
 /**
- * GitHub GitLab Dark Theme & Groups Extension - Main Entry Point
+ * GitHub GitLab Dark Theme & Groups Extension - Main Entry Point.
  * @author vernonthedev
  * @description Transforms GitHub to GitLab's dark theme with intelligent repository grouping and card-based management.
  */
@@ -15,6 +15,9 @@ import { GroupDisplayManager } from './core/repository/GroupDisplayManager.js';
 import { GroupControls } from './ui/components/GroupControls.js';
 import { GroupManagerModal } from './ui/managers/GroupManagerModal.js';
 
+/**
+ * Main extension class that orchestrates all functionality.
+ */
 class GitHubGitLabTheme {
   constructor() {
     this.storage = new StorageManager();
@@ -32,35 +35,35 @@ class GitHubGitLabTheme {
     this.observer = null;
   }
 
+  /**
+   * Initialize the extension.
+   */
   async init() {
     console.log('[GitHubGitLabTheme] Initializing extension...');
     
-    // Initialize storage and theme
     await this.storage.init();
     this.themeManager.init();
     
-    // Load settings
     await this.loadSettings();
     
-    // Initialize managers that depend on settings
     this.groupManager = new GroupManager(this.customGroups);
     this.repositoryProcessor = new RepositoryProcessor(this.groupManager, this.showGroupRepos.bind(this));
     
-    // Initialize navigation
     this.navigationManager = new NavigationManager(this.handleNavigationChange.bind(this));
     this.navigationManager.init();
     
-    // Process immediately if DOM is ready
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => this.run());
     } else {
       this.run();
     }
     
-    // Process again after a delay for dynamic content
     setTimeout(() => this.run(), 1000);
   }
 
+  /**
+   * Load user settings from storage.
+   */
   async loadSettings() {
     this.groupingEnabled = await this.storage.loadSetting('groupingEnabled', true);
     
@@ -73,30 +76,30 @@ class GitHubGitLabTheme {
     });
   }
 
+  /**
+   * Main run method to process the current page.
+   */
   run() {
-    // Only run on repository-related pages
     if (!PageDetector.isRepositoryPage()) {
       console.log('[GitHubGitLabTheme] Not a repository page, skipping processing');
       return;
     }
     
-    // Apply dark theme first
     this.themeManager.applyDarkTheme();
     
-    // Check page type for debugging
     const pageType = PageDetector.getPageType();
     if (pageType === 'organization') {
       console.log('[GitHubGitLabTheme] Organization page detected');
     }
     
-    // Setup observer for dynamic content
     this.setupMutationObserver();
-    
-    // Add controls and process repositories
     this.addGroupControls();
     this.processRepositories();
   }
 
+  /**
+   * Setup mutation observer for dynamic content.
+   */
   setupMutationObserver() {
     if (this.observer) this.observer.disconnect();
 
@@ -114,7 +117,6 @@ class GitHubGitLabTheme {
       if (shouldProcess) {
         if (this.debounceTimer) clearTimeout(this.debounceTimer);
         this.debounceTimer = setTimeout(() => {
-          // Only process if we're still on a repository page
           if (PageDetector.isRepositoryPage()) {
             this.addGroupControls();
             this.processRepositories();
@@ -123,7 +125,6 @@ class GitHubGitLabTheme {
       }
     });
 
-    // Only observe specific containers, not the entire body
     const targetSelectors = [
       '#user-repositories-list',
       '#org-repositories-list',
@@ -143,12 +144,14 @@ class GitHubGitLabTheme {
     });
   }
 
+  /**
+   * Process repository containers and apply grouping.
+   */
   processRepositories() {
     if (this.isProcessing) return;
     this.isProcessing = true;
 
     try {
-      // Always apply dark theme
       this.themeManager.applyDarkTheme();
       
       const containers = this.repositoryFinder.findRepositoryContainers();
@@ -157,7 +160,6 @@ class GitHubGitLabTheme {
         const items = this.repositoryFinder.findRepositoryItems(container);
         
         if (items.length > 0) {
-          // Only process if container hasn't been processed already
           if (!container.dataset.gitlabProcessed) {
             if (this.groupingEnabled && this.groupManager) {
               this.repositoryProcessor.createGroupCards(container, items);
@@ -176,6 +178,9 @@ class GitHubGitLabTheme {
     }
   }
 
+  /**
+   * Add group controls to the page.
+   */
   addGroupControls() {
     const existingControls = document.querySelector('.gitlab-group-controls');
     if (existingControls) return;
@@ -203,6 +208,10 @@ class GitHubGitLabTheme {
     }
   }
 
+  /**
+   * Handle grouping toggle.
+   * @param {boolean} enabled - New grouping state.
+   */
   handleToggleGrouping(enabled) {
     this.groupingEnabled = enabled;
     this.saveSetting('groupingEnabled', enabled);
@@ -210,6 +219,9 @@ class GitHubGitLabTheme {
     this.processRepositories();
   }
 
+  /**
+   * Show group management modal.
+   */
   showGroupManager() {
     const modal = new GroupManagerModal(
       this.customGroups,
@@ -219,6 +231,10 @@ class GitHubGitLabTheme {
     modal.show();
   }
 
+  /**
+   * Handle adding a custom group.
+   * @param {string} groupName - Group name to add.
+   */
   async handleAddGroup(groupName) {
     this.customGroups.add(groupName);
     await this.saveCustomGroups();
@@ -231,6 +247,10 @@ class GitHubGitLabTheme {
     this.processRepositories();
   }
 
+  /**
+   * Handle removing a custom group.
+   * @param {string} groupName - Group name to remove.
+   */
   async handleRemoveGroup(groupName) {
     this.customGroups.delete(groupName);
     await this.saveCustomGroups();
@@ -243,16 +263,28 @@ class GitHubGitLabTheme {
     this.processRepositories();
   }
 
+  /**
+   * Save custom groups to storage.
+   */
   async saveCustomGroups() {
     await this.storage.saveSetting('customGroups', Array.from(this.customGroups));
   }
 
+  /**
+   * Save setting to storage.
+   * @param {string} key - Setting key.
+   * @param {*} value - Setting value.
+   */
   async saveSetting(key, value) {
     await this.storage.saveSetting(key, value);
   }
 
+  /**
+   * Show repositories for a specific group.
+   * @param {string} groupId - Group identifier.
+   * @param {Element} card - Group card element.
+   */
   showGroupRepos(groupId, card) {
-    // Find the grouped repositories container
     const groupedContainer = card.closest('.gitlab-grouped-repositories') || 
                           card.parentElement.closest('.gitlab-grouped-repositories') ||
                           document.querySelector('.gitlab-grouped-repositories');
@@ -263,7 +295,6 @@ class GitHubGitLabTheme {
       this.groupDisplayManager.showGroupRepos(groupId, groupedContainer);
     } else {
       console.error(`[GitHubGitLabTheme] Could not find grouped repositories container`);
-      // Try to find any container with gitlab-grouped-repositories class
       const allGroupedContainers = document.querySelectorAll('.gitlab-grouped-repositories');
       if (allGroupedContainers.length > 0) {
         this.groupDisplayManager.showGroupRepos(groupId, allGroupedContainers[0]);
@@ -271,12 +302,18 @@ class GitHubGitLabTheme {
     }
   }
 
+  /**
+   * Handle navigation changes.
+   */
   handleNavigationChange() {
     console.log('[GitHubGitLabTheme] Handling navigation change');
     this.repositoryFinder.clearProcessedCache();
     this.run();
   }
 
+  /**
+   * Destroy the extension and cleanup.
+   */
   destroy() {
     if (this.observer) {
       this.observer.disconnect();
@@ -287,5 +324,4 @@ class GitHubGitLabTheme {
   }
 }
 
-// Initialize the extension
 new GitHubGitLabTheme();

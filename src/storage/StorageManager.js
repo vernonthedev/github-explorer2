@@ -1,5 +1,5 @@
 /**
- * Storage Manager - Handles all data persistence operations
+ * Storage Manager - Handles all data persistence operations.
  */
 
 export class StorageManager {
@@ -8,6 +8,9 @@ export class StorageManager {
     this.isInitialized = false;
   }
 
+  /**
+   * Initialize storage with IndexedDB and fallback mechanisms.
+   */
   async init() {
     if (this.isInitialized) return;
     
@@ -22,6 +25,10 @@ export class StorageManager {
     this.isInitialized = true;
   }
 
+  /**
+   * Initialize IndexedDB database.
+   * @throws {Error} When Dexie is not available.
+   */
   async initIndexedDB() {
     const Dexie = window.Dexie;
     if (!Dexie) {
@@ -35,10 +42,18 @@ export class StorageManager {
     });
   }
 
+  /**
+   * Initialize fallback storage mechanism.
+   */
   initFallbackStorage() {
     console.log('[Storage] Using fallback storage');
   }
 
+  /**
+   * Save a setting to storage with multiple fallback mechanisms.
+   * @param {string} key - Setting key.
+   * @param {*} value - Setting value.
+   */
   async saveSetting(key, value) {
     try {
       if (this.db) {
@@ -46,10 +61,7 @@ export class StorageManager {
         await this.db.settings.add({ key, value });
       }
       
-      // Fallback to localStorage
       localStorage.setItem(`gitlab_theme_${key}`, JSON.stringify(value));
-      
-      // Fallback to cookie
       this.setCookie(`gitlab_theme_${key}`, JSON.stringify(value), 365);
       
       console.log(`[Storage] Saved setting: ${key}`);
@@ -59,6 +71,12 @@ export class StorageManager {
     }
   }
 
+  /**
+   * Load a setting from storage with fallback mechanisms.
+   * @param {string} key - Setting key.
+   * @param {*} defaultValue - Default value if not found.
+   * @returns {*} Setting value or default.
+   */
   async loadSetting(key, defaultValue = null) {
     try {
       if (this.db) {
@@ -66,11 +84,9 @@ export class StorageManager {
         if (setting) return setting.value;
       }
       
-      // Try localStorage
       const localValue = localStorage.getItem(`gitlab_theme_${key}`);
       if (localValue) return JSON.parse(localValue);
       
-      // Try cookie
       const cookieValue = this.getCookie(`gitlab_theme_${key}`);
       if (cookieValue) return JSON.parse(cookieValue);
       
@@ -81,6 +97,11 @@ export class StorageManager {
     }
   }
 
+  /**
+   * Save setting using fallback mechanisms only.
+   * @param {string} key - Setting key.
+   * @param {*} value - Setting value.
+   */
   saveSettingFallback(key, value) {
     try {
       localStorage.setItem(`gitlab_theme_${key}`, JSON.stringify(value));
@@ -90,12 +111,23 @@ export class StorageManager {
     }
   }
 
+  /**
+   * Set a cookie with expiration.
+   * @param {string} name - Cookie name.
+   * @param {string} value - Cookie value.
+   * @param {number} days - Days until expiration.
+   */
   setCookie(name, value, days) {
     const expires = new Date();
     expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
     document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
   }
 
+  /**
+   * Get a cookie value by name.
+   * @param {string} name - Cookie name.
+   * @returns {string|null} Cookie value or null if not found.
+   */
   getCookie(name) {
     const nameEQ = name + "=";
     const ca = document.cookie.split(';');

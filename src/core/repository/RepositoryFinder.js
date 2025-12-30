@@ -1,5 +1,5 @@
 /**
- * Repository Finder - Locates and validates repository containers and items
+ * Repository Finder - Locates and validates repository containers and items.
  */
 
 export class RepositoryFinder {
@@ -7,6 +7,10 @@ export class RepositoryFinder {
     this.processedContainers = new Set();
   }
 
+  /**
+   * Find all repository containers on the page.
+   * @returns {Element[]} Array of repository container elements.
+   */
   findRepositoryContainers() {
     const selectors = [
       '#user-repositories-list',
@@ -17,7 +21,6 @@ export class RepositoryFinder {
       '.js-repo-list',
       'ul[data-test-selector="profile-repository-list"]',
       'div[aria-label="Repositories"]',
-      // Org page specific selectors
       'div[data-test-selector="org-repositories-list"]',
       '[data-test-selector="org-repo-list"]'
     ];
@@ -41,12 +44,21 @@ export class RepositoryFinder {
     return containers;
   }
 
+  /**
+   * Validate if container contains repository items.
+   * @param {Element} container - Container element to validate.
+   * @returns {boolean} True if valid repository container.
+   */
   isValidRepositoryContainer(container) {
-    // Check if container has repository items
     const repoItems = this.findRepositoryItems(container);
     return repoItems.length > 0;
   }
 
+  /**
+   * Find all repository items within a container.
+   * @param {Element} container - Container to search within.
+   * @returns {Element[]} Array of repository item elements.
+   */
   findRepositoryItems(container) {
     const itemSelectors = [
       '[itemprop="owns"]',
@@ -59,10 +71,9 @@ export class RepositoryFinder {
       '.archived',
       'li[itemprop="owns"]',
       'div[data-testid="repository-item"]',
-      // Org page specific selectors
       'li[data-test-selector="repository-list-item"]',
       'div[data-test-selector="repository-list-item"]',
-      '.Box-row', // GitHub uses Box-row for repo items on org pages
+      '.Box-row',
       'li[itemprop="codeRepository"]',
       'div[itemprop="codeRepository"]'
     ];
@@ -85,6 +96,11 @@ export class RepositoryFinder {
     return items;
   }
 
+  /**
+   * Extract repository name from item element.
+   * @param {Element} item - Repository item element.
+   * @returns {string} Repository name.
+   */
   getRepositoryName(item) {
     const nameSelectors = [
       'h3 a',
@@ -105,6 +121,9 @@ export class RepositoryFinder {
     return '';
   }
 
+  /**
+   * Clear the processed containers cache.
+   */
   clearProcessedCache() {
     this.processedContainers.clear();
   }

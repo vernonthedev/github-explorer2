@@ -1,5 +1,5 @@
 /**
- * Theme Manager - Handles dark theme application and management
+ * Theme Manager - Handles dark theme application and management.
  */
 
 export class ThemeManager {
@@ -7,18 +7,20 @@ export class ThemeManager {
     this.isDarkMode = true;
   }
 
+  /**
+   * Initialize theme manager and apply dark theme.
+   */
   init() {
     this.applyDarkTheme();
   }
 
+  /**
+   * Apply dark theme to the document.
+   */
   applyDarkTheme() {
-    // Apply dark theme immediately and ensure it stays applied
     document.body.classList.add('gitlab-dark-theme');
-    
-    // Also apply to html element
     document.documentElement.classList.add('gitlab-dark-theme');
     
-    // Force dark mode with CSS if needed
     if (!document.querySelector('#gitlab-dark-theme-forcer')) {
       const style = document.createElement('style');
       style.id = 'gitlab-dark-theme-forcer';
@@ -30,6 +32,9 @@ export class ThemeManager {
     }
   }
 
+  /**
+   * Remove dark theme from the document.
+   */
   removeDarkTheme() {
     document.body.classList.remove('gitlab-dark-theme');
     document.documentElement.classList.remove('gitlab-dark-theme');
@@ -40,6 +45,9 @@ export class ThemeManager {
     }
   }
 
+  /**
+   * Toggle between dark and light themes.
+   */
   toggleTheme() {
     if (this.isDarkMode) {
       this.removeDarkTheme();

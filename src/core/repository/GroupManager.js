@@ -1,5 +1,5 @@
 /**
- * Group Manager - Handles repository grouping logic
+ * Group Manager - Handles repository grouping logic.
  */
 
 export class GroupManager {
@@ -7,6 +7,11 @@ export class GroupManager {
     this.customGroups = customGroups;
   }
 
+  /**
+   * Extract groups from repository items.
+   * @param {Element[]} items - Repository item elements.
+   * @returns {Map<string, Element[]>} Map of group names to repository items.
+   */
   extractGroups(items) {
     const groups = new Map();
 
@@ -23,6 +28,11 @@ export class GroupManager {
     return groups;
   }
 
+  /**
+   * Get group name for a repository.
+   * @param {string} repoName - Repository name.
+   * @returns {string} Group name.
+   */
   getGroupName(repoName) {
     if (!repoName) return 'General';
     
@@ -46,6 +56,11 @@ export class GroupManager {
     return 'General';
   }
 
+  /**
+   * Extract repository name from item element.
+   * @param {Element} item - Repository item element.
+   * @returns {string} Repository name.
+   */
   getRepositoryName(item) {
     const nameSelectors = [
       'h3 a',
@@ -66,6 +81,11 @@ export class GroupManager {
     return '';
   }
 
+  /**
+   * Get icon for a group name.
+   * @param {string} groupName - Group name.
+   * @returns {string} SVG icon HTML.
+   */
   getGroupIcon(groupName) {
     const iconMap = {
       'All Repositories': '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>',
@@ -81,6 +101,10 @@ export class GroupManager {
     return iconMap[groupName] || iconMap['Default'];
   }
 
+  /**
+   * Update custom groups set.
+   * @param {Set<string>} newGroups - New custom groups.
+   */
   updateCustomGroups(newGroups) {
     this.customGroups = new Set(newGroups);
   }
