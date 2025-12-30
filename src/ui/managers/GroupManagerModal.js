@@ -170,7 +170,7 @@ export class GroupManagerModal {
 }
 
   show() {
-    // Close existing modal if present
+    // Close existing modal if present.
     this.close();
 
     const manager = this.createModal();
@@ -231,13 +231,13 @@ export class GroupManagerModal {
   }
 
   setupEventListeners(manager) {
-    // Close button
+    // Close button.
     document.getElementById('close-manager-btn').onclick = () => this.close();
     
-    // Add group button
+    // Add group button.
     document.getElementById('add-group-btn').onclick = () => this.handleAddGroup();
     
-    // Remove group buttons
+    // Remove group buttons.
     document.querySelectorAll('.gitlab-remove-group').forEach(btn => {
       btn.onclick = (e) => {
         const group = e.target.dataset.group;
@@ -246,14 +246,14 @@ export class GroupManagerModal {
       };
     });
 
-    // Click outside to close
+    // Click outside to close.
     manager.onclick = (e) => {
       if (e.target === manager) {
         this.close();
       }
     };
 
-    // Enter key to add group
+    // Enter key to add group.
     document.getElementById('new-group-name').onkeypress = (e) => {
       if (e.key === 'Enter') {
         this.handleAddGroup();

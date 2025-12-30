@@ -172,7 +172,7 @@ export class RepositoryProcessor {
       return;
     }
 
-    // Store original content and clear container safely
+    // Store original content and clear container safely.
     const originalContent = container.innerHTML;
     const originalClasses = container.className;
     
@@ -182,17 +182,17 @@ export class RepositoryProcessor {
 
       const fragment = document.createDocumentFragment();
       
-      // Create group cards section
+      // Create group cards section.
       const groupCardsSection = this.createGroupCardsSection(groups, container);
       fragment.appendChild(groupCardsSection);
 
-      // Create hidden repo containers for each group
+      // Create hidden repo containers for each group.
       const repoContainersSection = this.createRepoContainers(groups, container);
       fragment.appendChild(repoContainersSection);
 
       container.appendChild(fragment);
 
-      // Show the first group by default
+      // Show the first group by default.
       this.autoShowFirstGroup(container);
 
     } catch (error) {
@@ -204,7 +204,7 @@ export class RepositoryProcessor {
   }
 
   displayAllRepos(container, items) {
-    // Only modify if we haven't already processed this container
+    // Only modify if we haven't already processed this container.
     if (container.dataset.gitlabProcessed === 'true') {
       return;
     }
@@ -215,7 +215,7 @@ export class RepositoryProcessor {
       fragment.appendChild(item);
     });
 
-    // Preserve non-repo items
+    // Preserve non-repo items.
     const nonRepoItems = Array.from(container.children).filter(child => 
       !items.includes(child) && 
       !child.classList.contains('gitlab-cards-section') &&
@@ -235,11 +235,11 @@ export class RepositoryProcessor {
     const containerDiv = document.createElement('div');
     containerDiv.className = 'gitlab-group-cards-container';
 
-    // Add "All Repositories" card
+    // Add "All Repositories" card.
     const allReposCard = new GroupCard('All Repositories', Array.from(groups.values()).flat(), 'all', this.onShowGroupRepos);
     containerDiv.appendChild(allReposCard.create());
 
-    // Add group cards
+    // Add group cards.
     Array.from(groups.entries()).forEach(([name, items]) => {
       const card = new GroupCard(name, items, name, this.onShowGroupRepos);
       containerDiv.appendChild(card.create());
@@ -253,7 +253,7 @@ export class RepositoryProcessor {
     const section = document.createElement('div');
     section.className = 'gitlab-repos-section';
 
-    // Create container for "All Repositories"
+    // Create container for "All Repositories".
     const allReposContainer = document.createElement(container.tagName);
     allReposContainer.className = container.className;
     allReposContainer.classList.add('gitlab-repo-container');
@@ -266,7 +266,7 @@ export class RepositoryProcessor {
 
     section.appendChild(allReposContainer);
 
-    // Create containers for each group
+    // Create containers for each group.
     Array.from(groups.entries()).forEach(([name, items]) => {
       const groupContainer = document.createElement(container.tagName);
       groupContainer.className = container.className;
@@ -288,7 +288,7 @@ export class RepositoryProcessor {
     const firstGroup = Array.from(this.groupManager.extractGroups([]).keys())[0] || 'all';
     console.log(`[RepositoryProcessor] Auto-showing first group: ${firstGroup}`);
     
-    // Wait a bit for DOM to settle, then simulate first group click
+    // Wait a bit for DOM to settle, then simulate first group click.
     setTimeout(() => {
       console.log(`[RepositoryProcessor] Attempting to show first group...`);
       const firstCard = container.querySelector(`.gitlab-group-card[data-group-id="${firstGroup}"]`);

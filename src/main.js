@@ -1,6 +1,6 @@
 /**
  * GitHub GitLab Dark Theme & Groups Extension - Main Entry Point.
- * @author vernonthedev
+ * @author vernonthedev.
  * @description Transforms GitHub to GitLab's dark theme with intelligent repository grouping and card-based management.
  */
 

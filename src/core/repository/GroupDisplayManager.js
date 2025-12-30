@@ -97,7 +97,7 @@ export class GroupDisplayManager {
   showGroupRepos(groupId, container) {
     console.log(`[GroupDisplayManager] Showing repos for group: ${groupId}`);
     
-    // Find the repos section within the grouped container
+    // Find the repos section within the grouped container.
     const reposSection = container.querySelector('.gitlab-repos-section');
     
     if (!reposSection) {
@@ -111,7 +111,7 @@ export class GroupDisplayManager {
     
     this.currentActiveGroup = groupId;
     
-    // Scroll to the repos section
+    // Scroll to the repos section.
     reposSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
@@ -130,7 +130,7 @@ export class GroupDisplayManager {
       selectedContainer.style.display = 'block';
       console.log(`[GroupDisplayManager] Found and showing container for ${groupId} with ${selectedContainer.children.length} items`);
       
-      // Ensure repository items are visible
+      // Ensure repository items are visible.
       Array.from(selectedContainer.children).forEach((child, index) => {
         child.style.display = '';
       });
@@ -142,13 +142,13 @@ export class GroupDisplayManager {
   }
 
   updateActiveCard(container, groupId) {
-    // Hide all cards
+    // Hide all cards.
     const allCards = container.querySelectorAll('.gitlab-group-card');
     allCards.forEach(card => {
       card.classList.remove('active');
     });
 
-    // Show active card
+    // Show active card.
     const activeCard = container.querySelector(`.gitlab-group-card[data-group-id="${groupId}"]`);
     if (activeCard) {
       activeCard.classList.add('active');
