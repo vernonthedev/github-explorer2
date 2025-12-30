@@ -43,6 +43,40 @@ class GitHubGitLabTheme {
     this.setupNavigationListener();
   }
 
+isRepositoryPage() {
+    const pathname = window.location.pathname;
+    
+    // Check for user profile repositories page
+    if (pathname.match(/^\/[^\/]+$/)) {
+      const pageHeader = document.querySelector('h1');
+      if (pageHeader && pageHeader.textContent.includes('Repositories')) {
+        return true;
+      }
+    }
+    
+    // Check for user repositories tab
+    if (pathname.includes('?tab=repositories')) {
+      return true;
+    }
+    
+    // Check for organization repositories page
+    if (pathname.includes('/orgs/') && 
+        (pathname.includes('/repositories') || 
+         document.querySelector('[data-test-selector="org-repositories-list"]'))) {
+      return true;
+    }
+    
+    // Check for repository list containers
+    const repoContainers = [
+      '#user-repositories-list',
+      '#org-repositories-list',
+      '[data-testid="repository-list-container"]',
+      'div[data-test-selector="org-repositories-list"]'
+    ];
+    
+    return repoContainers.some(selector => document.querySelector(selector));
+  }
+
   setupNavigationListener() {
     // Listen for URL changes (GitHub is an SPA)
     let currentUrl = window.location.href;
@@ -55,7 +89,7 @@ class GitHubGitLabTheme {
           this.run();
         }, 500);
       }
-    }).observe(document, { subtree: true, childList: true });
+    }).observe(document.body, { subtree: true, childList: true });
   }
 
   applyDarkTheme() {
@@ -182,7 +216,13 @@ class GitHubGitLabTheme {
     await this.saveSetting('customGroups', Array.from(this.customGroups));
   }
 
-  run() {
+run() {
+    // Only run on repository-related pages
+    if (!this.isRepositoryPage()) {
+      console.log('[GitLab Theme] Not a repository page, skipping processing');
+      return;
+    }
+    
     // Apply dark theme first
     this.applyDarkTheme();
     
@@ -203,7 +243,7 @@ class GitHubGitLabTheme {
     this.processRepositories();
   }
 
-  setupMutationObserver() {
+setupMutationObserver() {
     if (this.observer) this.observer.disconnect();
 
     this.observer = new MutationObserver((mutations) => {
@@ -220,24 +260,40 @@ class GitHubGitLabTheme {
       if (shouldProcess) {
         if (this.debounceTimer) clearTimeout(this.debounceTimer);
         this.debounceTimer = setTimeout(() => {
-          this.addGroupControls();
-          this.processRepositories();
+          // Only process if we're still on a repository page
+          if (this.isRepositoryPage()) {
+            this.addGroupControls();
+            this.processRepositories();
+          }
         }, 300);
       }
     });
 
-    this.observer.observe(document.body, {
-      childList: true,
-      subtree: true
+    // Only observe specific containers, not the entire body
+    const targetSelectors = [
+      '#user-repositories-list',
+      '#org-repositories-list',
+      '[data-testid="repository-list-container"]',
+      'div[data-test-selector="org-repositories-list"]',
+      'main[role="main"]'
+    ];
+
+    targetSelectors.forEach(selector => {
+      const element = document.querySelector(selector);
+      if (element) {
+        this.observer.observe(element, {
+          childList: true,
+          subtree: true
+        });
+      }
     });
   }
 
-  findRepositoryContainers() {
+findRepositoryContainers() {
     const selectors = [
       '#user-repositories-list',
       '#org-repositories-list', 
       '[data-testid="repository-list-container"]',
-      '.repo-list',
       '[data-filterable-for="your-repos-filter"]',
       '[data-filterable-for="org-repos-filter"]',
       '.js-repo-list',
@@ -245,10 +301,7 @@ class GitHubGitLabTheme {
       'div[aria-label="Repositories"]',
       // Org page specific selectors
       'div[data-test-selector="org-repositories-list"]',
-      '.org-repos',
-      '#org-repositories',
-      '[data-test-selector="org-repo-list"]',
-      'div[data-target="org-repositories.repositoryList"]'
+      '[data-test-selector="org-repo-list"]'
     ];
 
     const containers = [];
@@ -256,7 +309,7 @@ class GitHubGitLabTheme {
       try {
         const elements = document.querySelectorAll(selector);
         elements.forEach(el => {
-          if (el && !this.processedContainers.has(el)) {
+          if (el && !this.processedContainers.has(el) && this.isValidRepositoryContainer(el)) {
             containers.push(el);
             this.processedContainers.add(el);
           }
@@ -266,39 +319,14 @@ class GitHubGitLabTheme {
       }
     });
 
-    // If no containers found with specific selectors, try broader search
-    if (containers.length === 0) {
-      console.log('[GitLab Theme] No specific containers found, trying broader search');
-      
-      // Look for any list containing repository links
-      const repoLinks = document.querySelectorAll('a[href*="/"][href*="/"]');
-      if (repoLinks.length > 0) {
-        // Find common parents of repo links that might be containers
-        const potentialContainers = new Set();
-        repoLinks.forEach(link => {
-          if (link.href.match(/github\.com\/[^\/]+\/[^\/]+\/?$/)) {
-            let parent = link.parentElement;
-            while (parent && parent !== document.body) {
-              if (parent.children.length > 1) {
-                potentialContainers.add(parent);
-                break;
-              }
-              parent = parent.parentElement;
-            }
-          }
-        });
-        
-        potentialContainers.forEach(container => {
-          if (!this.processedContainers.has(container)) {
-            containers.push(container);
-            this.processedContainers.add(container);
-          }
-        });
-      }
-    }
-
     console.log(`[GitLab Theme] Found ${containers.length} repository containers`);
     return containers;
+  }
+
+  isValidRepositoryContainer(container) {
+    // Check if container has repository items
+    const repoItems = this.findRepositoryItems(container);
+    return repoItems.length > 0;
   }
 
   findRepositoryItems(container) {
@@ -339,7 +367,7 @@ class GitHubGitLabTheme {
     return items;
   }
 
-  processRepositories() {
+processRepositories() {
     if (this.isProcessing) return;
     this.isProcessing = true;
 
@@ -353,12 +381,15 @@ class GitHubGitLabTheme {
         const items = this.findRepositoryItems(container);
         
         if (items.length > 0) {
-          if (this.groupingEnabled) {
-            this.createGroupCards(container, items);
-          } else {
-            this.displayAllRepos(container, items);
+          // Only process if container hasn't been processed already
+          if (!container.dataset.gitlabProcessed) {
+            if (this.groupingEnabled) {
+              this.createGroupCards(container, items);
+            } else {
+              this.displayAllRepos(container, items);
+            }
+            container.dataset.gitlabProcessed = 'true';
           }
-          container.dataset.gitlabProcessed = 'true';
         }
       });
 
@@ -369,7 +400,7 @@ class GitHubGitLabTheme {
     }
   }
 
-  createGroupCards(container, items) {
+createGroupCards(container, items) {
     const groups = this.extractGroups(items);
     
     if (groups.size <= 1) {
@@ -377,38 +408,48 @@ class GitHubGitLabTheme {
       return;
     }
 
-    // Clear existing content
-    container.innerHTML = '';
-    container.classList.add('gitlab-grouped-repositories');
-
-    const fragment = document.createDocumentFragment();
+    // Store original content and clear container safely
+    const originalContent = container.innerHTML;
+    const originalClasses = container.className;
     
-    // Create group cards section
-    const groupCardsSection = this.createGroupCardsSection(groups, container);
-    fragment.appendChild(groupCardsSection);
+    try {
+      container.innerHTML = '';
+      container.classList.add('gitlab-grouped-repositories');
 
-    // Create hidden repo containers for each group
-    const repoContainersSection = this.createRepoContainers(groups, container);
-    fragment.appendChild(repoContainersSection);
+      const fragment = document.createDocumentFragment();
+      
+      // Create group cards section
+      const groupCardsSection = this.createGroupCardsSection(groups, container);
+      fragment.appendChild(groupCardsSection);
 
-    container.appendChild(fragment);
+      // Create hidden repo containers for each group
+      const repoContainersSection = this.createRepoContainers(groups, container);
+      fragment.appendChild(repoContainersSection);
 
-    // Show the first group by default
-    const firstGroup = Array.from(groups.keys())[0];
-    console.log(`[GitLab Theme] Auto-showing first group: ${firstGroup}`);
-    
-    // Wait a bit for DOM to settle, then simulate first group click
-    setTimeout(() => {
-      console.log(`[GitLab Theme] Attempting to show first group...`);
-      const firstCard = container.querySelector(`.gitlab-group-card[data-group-id="${firstGroup}"]`);
-      if (firstCard) {
-        console.log(`[GitLab Theme] Found first group card, simulating click`);
-        firstCard.click();
-      } else {
-        console.error(`[GitLab Theme] Could not find first group card: ${firstGroup}`);
-        console.log(`[GitLab Theme] Available cards:`, container.querySelectorAll('.gitlab-group-card'));
-      }
-    }, 200);
+      container.appendChild(fragment);
+
+      // Show the first group by default
+      const firstGroup = Array.from(groups.keys())[0];
+      console.log(`[GitLab Theme] Auto-showing first group: ${firstGroup}`);
+      
+      // Wait a bit for DOM to settle, then simulate first group click
+      setTimeout(() => {
+        console.log(`[GitLab Theme] Attempting to show first group...`);
+        const firstCard = container.querySelector(`.gitlab-group-card[data-group-id="${firstGroup}"]`);
+        if (firstCard) {
+          console.log(`[GitLab Theme] Found first group card, simulating click`);
+          firstCard.click();
+        } else {
+          console.error(`[GitLab Theme] Could not find first group card: ${firstGroup}`);
+          console.log(`[GitLab Theme] Available cards:`, container.querySelectorAll('.gitlab-group-card'));
+        }
+      }, 200);
+    } catch (error) {
+      console.error('[GitLab Theme] Error creating group cards, reverting to original content:', error);
+      container.innerHTML = originalContent;
+      container.className = originalClasses;
+      this.displayAllRepos(container, items);
+    }
   }
 
   extractGroups(items) {
@@ -622,7 +663,12 @@ class GitHubGitLabTheme {
     reposSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  displayAllRepos(container, items) {
+displayAllRepos(container, items) {
+    // Only modify if we haven't already processed this container
+    if (container.dataset.gitlabProcessed === 'true') {
+      return;
+    }
+
     const fragment = document.createDocumentFragment();
     
     items.forEach(item => {

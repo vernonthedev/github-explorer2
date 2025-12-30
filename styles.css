@@ -48,9 +48,9 @@ body.gitlab-dark-theme,
   color: #ceced9 !important;
 }
 
-/* Force dark theme immediately */
-body,
-html {
+/* Force dark theme immediately - more targeted */
+body.gitlab-dark-theme,
+html.gitlab-dark-theme {
   font-family: var(--gl-font) !important;
   background-color: #0d0e11 !important;
   color: #ceced9 !important;
@@ -58,67 +58,67 @@ html {
   transition: var(--gl-transition);
 }
 
-/* GitHub Global Dark Theme Override */
-body[data-color-mode="auto"],
-body[data-color-mode="dark"] {
+/* GitHub Global Dark Theme Override - more targeted */
+body.gitlab-dark-theme[data-color-mode="auto"],
+body.gitlab-dark-theme[data-color-mode="dark"] {
   background-color: #0d0e11 !important;
 }
 
-/* Dark theme for all major GitHub elements */
-.Header,
-header[role="banner"],
-.js-header-wrapper,
-.application-main,
-.env-production,
-.Box,
-.Box-body,
-.Box-header,
-.pagehead,
-.discussion-timeline,
-.OverallSummary,
-.main-content,
-.site-header,
-.site-footer,
-.subnav,
-.container,
-.container-lg,
-.container-xl {
+/* Dark theme for major GitHub elements - only when gitlab theme is active */
+body.gitlab-dark-theme .Header,
+body.gitlab-dark-theme header[role="banner"],
+body.gitlab-dark-theme .js-header-wrapper,
+body.gitlab-dark-theme .application-main,
+body.gitlab-dark-theme .env-production,
+body.gitlab-dark-theme .Box,
+body.gitlab-dark-theme .Box-body,
+body.gitlab-dark-theme .Box-header,
+body.gitlab-dark-theme .pagehead,
+body.gitlab-dark-theme .discussion-timeline,
+body.gitlab-dark-theme .OverallSummary,
+body.gitlab-dark-theme .main-content,
+body.gitlab-dark-theme .site-header,
+body.gitlab-dark-theme .site-footer,
+body.gitlab-dark-theme .subnav,
+body.gitlab-dark-theme .container,
+body.gitlab-dark-theme .container-lg,
+body.gitlab-dark-theme .container-xl {
   background-color: var(--gl-white) !important;
   border-color: var(--gl-border) !important;
 }
 
-/* Links and text */
-a,
-.Header-link,
-.header-nav-link,
-.HeaderMenu-link,
-.link-gray,
-.text-gray,
-.text-gray-dark,
-.f5,
-.f6,
-.pjax-link {
+/* Links and text - only when gitlab theme is active */
+body.gitlab-dark-theme a,
+body.gitlab-dark-theme .Header-link,
+body.gitlab-dark-theme .header-nav-link,
+body.gitlab-dark-theme .HeaderMenu-link,
+body.gitlab-dark-theme .link-gray,
+body.gitlab-dark-theme .text-gray,
+body.gitlab-dark-theme .text-gray-dark,
+body.gitlab-dark-theme .f5,
+body.gitlab-dark-theme .f6,
+body.gitlab-dark-theme .pjax-link {
   color: var(--gl-gray-700) !important;
 }
 
-/* Links on hover */
-a:hover,
-.Header-link:hover,
-.header-nav-link:hover,
-.HeaderMenu-link:hover {
+/* Links on hover - only when gitlab theme is active */
+body.gitlab-dark-theme a:hover,
+body.gitlab-dark-theme .Header-link:hover,
+body.gitlab-dark-theme .header-nav-link:hover,
+body.gitlab-dark-theme .HeaderMenu-link:hover {
   color: var(--gl-primary) !important;
 }
 
-/* Repository List Items - Standard Rounding */
-.repo-list-item,
-li[itemprop="owns"],
-[data-testid="repository-list-item"],
-.org-repo,
-.source,
-.public,
-.private,
-.fork,
-.archived {
+/* Repository List Items - Standard Rounding - only when gitlab theme is active */
+body.gitlab-dark-theme .repo-list-item,
+body.gitlab-dark-theme li[itemprop="owns"],
+body.gitlab-dark-theme [data-testid="repository-list-item"],
+body.gitlab-dark-theme .org-repo,
+body.gitlab-dark-theme .source,
+body.gitlab-dark-theme .public,
+body.gitlab-dark-theme .private,
+body.gitlab-dark-theme .fork,
+body.gitlab-dark-theme .archived {
   background: var(--gl-white) !important;
   border: 1px solid var(--gl-border) !important;
   border-radius: var(--gl-radius) !important;
@@ -130,24 +130,24 @@ li[itemprop="owns"],
   color: var(--gl-gray-700) !important;
 }
 
-.repo-list-item:hover,
-li[itemprop="owns"]:hover,
-[data-testid="repository-list-item"]:hover,
-.org-repo:hover,
-.source:hover,
-.public:hover,
-.private:hover,
-.fork:hover,
-.archived:hover {
+body.gitlab-dark-theme .repo-list-item:hover,
+body.gitlab-dark-theme li[itemprop="owns"]:hover,
+body.gitlab-dark-theme [data-testid="repository-list-item"]:hover,
+body.gitlab-dark-theme .org-repo:hover,
+body.gitlab-dark-theme .source:hover,
+body.gitlab-dark-theme .public:hover,
+body.gitlab-dark-theme .private:hover,
+body.gitlab-dark-theme .fork:hover,
+body.gitlab-dark-theme .archived:hover {
   border-color: var(--gl-primary) !important;
   box-shadow: var(--gl-shadow) !important;
   transform: translateY(-1px) !important;
   background: var(--gl-gray-50) !important;
 }
 
-.repo-list-item h3 a,
-.wb-break-all a,
-[data-testid="repository-list-item"] a[href*="/"] {
+body.gitlab-dark-theme .repo-list-item h3 a,
+body.gitlab-dark-theme .wb-break-all a,
+body.gitlab-dark-theme [data-testid="repository-list-item"] a[href*="/"] {
   color: var(--gl-gray-700) !important;
   font-weight: 600 !important;
   font-size: 16px !important;
@@ -155,9 +155,9 @@ li[itemprop="owns"]:hover,
   transition: var(--gl-transition) !important;
 }
 
-.repo-list-item h3 a:hover,
-.wb-break-all a:hover,
-[data-testid="repository-list-item"] a[href*="/"]:hover {
+body.gitlab-dark-theme .repo-list-item h3 a:hover,
+body.gitlab-dark-theme .wb-break-all a:hover,
+body.gitlab-dark-theme [data-testid="repository-list-item"] a[href*="/"]:hover {
   color: var(--gl-primary) !important;
 }
 
