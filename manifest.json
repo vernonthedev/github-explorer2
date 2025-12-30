@@ -18,10 +18,11 @@
       "css": [
         "styles.css"
       ],
-      "js": [
+"js": [
         "node_modules/dexie/dist/dexie.min.js",
-        "content.js"
+        "src/main.js"
       ],
+      "type": "module",
       "run_at": "document_idle"
     }
   ],
