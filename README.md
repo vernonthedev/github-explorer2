@@ -79,6 +79,15 @@ Once installed, the extension automatically:
 - **Styling issues?**: Refresh the page after installation
 - **Performance problems?**: The extension includes debouncing and cleanup mechanisms
 
+## Project Stats
+## ⭐ Project Stats
+
+<div align="center">
+
+[![Star History Chart](https://api.star-history.com/svg?repos=vernonthedev/github-explorer2&type=Date)](https://star-history.com/#yuaotian/go-cursor-help&Date)
+
+![Alt](https://repobeats.axiom.co/api/embed/40dc572aae96065261c75036d2352093e7ffdd14.svg "Repobeats analytics image")
+</div>
 ---
 
  Made with love by [vernonthedev](https://github.com/vernonthedev)
