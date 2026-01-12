@@ -80,7 +80,6 @@ Once installed, the extension automatically:
 - **Performance problems?**: The extension includes debouncing and cleanup mechanisms
 
 ## Project Stats
-## ⭐ Project Stats
 
 <div align="center">
 
