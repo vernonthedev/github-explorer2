@@ -1,8 +1,10 @@
 {
-  "name": "github-gitlab-dark-theme-groups",
+  "name": "github-explorer2",
   "version": "1.0.0",
-  "description": "Transforms GitHub to GitLab's dark theme with intelligent repository grouping and card-based management",
+  "description": "Transforms GitHub with intelligent repository grouping and card-based management",
   "main": "src/main.js",
+  "author": "vernonthedev",
+  "license": "MIT",
   "scripts": {
     "prepare": "husky",
     "test": "jest",
