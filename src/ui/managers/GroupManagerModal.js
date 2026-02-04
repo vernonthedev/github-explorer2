@@ -30,7 +30,7 @@ export class GroupManagerModal {
    * Close the modal.
    */
   close() {
-    const existing = document.querySelector('.gitlab-group-manager');
+    const existing = document.querySelector(".github-group-manager");
     if (existing) {
       existing.remove();
     }
@@ -41,8 +41,8 @@ export class GroupManagerModal {
    * @returns {Element} Modal element.
    */
   createModal() {
-    const manager = document.createElement('div');
-    manager.className = 'gitlab-group-manager';
+    const manager = document.createElement("div");
+    manager.className = "github-group-manager";
     manager.innerHTML = this.getModalHTML();
     return manager;
   }
@@ -53,22 +53,22 @@ export class GroupManagerModal {
    */
   getModalHTML() {
     return `
-      <div class="gitlab-manager-content">
+      <div class="github-manager-content">
         <h3>Manage Repository Groups</h3>
-        <div class="gitlab-manager-body">
-          <div class="gitlab-group-list">
+        <div class="github-manager-body">
+          <div class="github-group-list">
             <h4>Current Custom Groups</h4>
             <div id="custom-groups-list">
               ${this.getGroupsListHTML()}
             </div>
           </div>
-          <div class="gitlab-add-group">
+          <div class="github-add-group">
             <h4>Add New Group</h4>
             <input type="text" id="new-group-name" placeholder="Enter group name..." />
             <button id="add-group-btn">Add Group</button>
           </div>
         </div>
-        <div class="gitlab-manager-footer">
+        <div class="github-manager-footer">
           <button id="close-manager-btn">Close</button>
         </div>
       </div>
@@ -81,15 +81,19 @@ export class GroupManagerModal {
    */
   getGroupsListHTML() {
     if (this.customGroups.size === 0) {
-      return '<p class="gitlab-no-groups">No custom groups yet</p>';
+      return '<p class="github-no-groups">No custom groups yet</p>';
     }
 
-    return Array.from(this.customGroups).map(group => `
-      <div class="gitlab-group-item">
+    return Array.from(this.customGroups)
+      .map(
+        (group) => `
+      <div class="github-group-item">
         <span>${group}</span>
-        <button class="gitlab-remove-group" data-group="${group}"></button>
+        <button class="github-remove-group" data-group="${group}"></button>
       </div>
-    `).join('');
+    `,
+      )
+      .join("");
   }
 
   /**
@@ -97,11 +101,12 @@ export class GroupManagerModal {
    * @param {Element} manager - Modal element.
    */
   setupEventListeners(manager) {
-    document.getElementById('close-manager-btn').onclick = () => this.close();
-    
-    document.getElementById('add-group-btn').onclick = () => this.handleAddGroup();
-    
-    document.querySelectorAll('.gitlab-remove-group').forEach(btn => {
+    document.getElementById("close-manager-btn").onclick = () => this.close();
+
+    document.getElementById("add-group-btn").onclick = () =>
+      this.handleAddGroup();
+
+    document.querySelectorAll(".github-remove-group").forEach((btn) => {
       btn.onclick = (e) => {
         const group = e.target.dataset.group;
         this.onRemoveGroup(group);
@@ -115,8 +120,8 @@ export class GroupManagerModal {
       }
     };
 
-    document.getElementById('new-group-name').onkeypress = (e) => {
-      if (e.key === 'Enter') {
+    document.getElementById("new-group-name").onkeypress = (e) => {
+      if (e.key === "Enter") {
         this.handleAddGroup();
       }
     };
@@ -126,12 +131,12 @@ export class GroupManagerModal {
    * Handle add group action.
    */
   handleAddGroup() {
-    const input = document.getElementById('new-group-name');
+    const input = document.getElementById("new-group-name");
     const groupName = input.value.trim();
-    
+
     if (groupName && !this.customGroups.has(groupName)) {
       this.onAddGroup(groupName);
-      input.value = '';
+      input.value = "";
       this.refresh();
     }
   }
@@ -140,7 +145,7 @@ export class GroupManagerModal {
    * Refresh modal content.
    */
   refresh() {
-    const groupsList = document.getElementById('custom-groups-list');
+    const groupsList = document.getElementById("custom-groups-list");
     if (groupsList) {
       groupsList.innerHTML = this.getGroupsListHTML();
       this.setupRemoveGroupListeners();
@@ -151,7 +156,7 @@ export class GroupManagerModal {
    * Setup remove group listeners.
    */
   setupRemoveGroupListeners() {
-    document.querySelectorAll('.gitlab-remove-group').forEach(btn => {
+    document.querySelectorAll(".github-remove-group").forEach((btn) => {
       btn.onclick = (e) => {
         const group = e.target.dataset.group;
         this.onRemoveGroup(group);
@@ -168,6 +173,5 @@ export class GroupManagerModal {
     this.customGroups = newGroups;
   }
 }
-
 
 module.exports = GroupManagerModal;

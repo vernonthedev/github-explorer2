@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
 
 :root {
   --gl-primary: #fc6d26;
@@ -17,7 +17,9 @@
   --gl-gray-700: #333333;
   --gl-gray-900: #1f1e24;
   --gl-border: var(--gl-gray-200);
-  --gl-font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --gl-font:
+    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
   --gl-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
   --gl-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   --gl-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -28,9 +30,9 @@
 }
 
 /* Dark Theme Variables - Always Active */
-html.gitlab-dark-theme,
-body.gitlab-dark-theme,
-.gitlab-dark-theme {
+html.github-dark-theme,
+body.github-dark-theme,
+.github-dark-theme {
   --gl-white: #1f1e24;
   --gl-gray-10: #0d0e11;
   --gl-gray-50: #1f1e24;
@@ -49,8 +51,8 @@ body.gitlab-dark-theme,
 }
 
 /* Force dark theme immediately - more targeted */
-body.gitlab-dark-theme,
-html.gitlab-dark-theme {
+body.github-dark-theme,
+html.github-dark-theme {
   font-family: var(--gl-font) !important;
   background-color: #0d0e11 !important;
   color: #ceced9 !important;
@@ -59,66 +61,66 @@ html.gitlab-dark-theme {
 }
 
 /* GitHub Global Dark Theme Override - more targeted */
-body.gitlab-dark-theme[data-color-mode="auto"],
-body.gitlab-dark-theme[data-color-mode="dark"] {
+body.github-dark-theme[data-color-mode="auto"],
+body.github-dark-theme[data-color-mode="dark"] {
   background-color: #0d0e11 !important;
 }
 
-/* Dark theme for major GitHub elements - only when gitlab theme is active */
-body.gitlab-dark-theme .Header,
-body.gitlab-dark-theme header[role="banner"],
-body.gitlab-dark-theme .js-header-wrapper,
-body.gitlab-dark-theme .application-main,
-body.gitlab-dark-theme .env-production,
-body.gitlab-dark-theme .Box,
-body.gitlab-dark-theme .Box-body,
-body.gitlab-dark-theme .Box-header,
-body.gitlab-dark-theme .pagehead,
-body.gitlab-dark-theme .discussion-timeline,
-body.gitlab-dark-theme .OverallSummary,
-body.gitlab-dark-theme .main-content,
-body.gitlab-dark-theme .site-header,
-body.gitlab-dark-theme .site-footer,
-body.gitlab-dark-theme .subnav,
-body.gitlab-dark-theme .container,
-body.gitlab-dark-theme .container-lg,
-body.gitlab-dark-theme .container-xl {
+/* Dark theme for major GitHub elements - only when github theme is active */
+body.github-dark-theme .Header,
+body.github-dark-theme header[role="banner"],
+body.github-dark-theme .js-header-wrapper,
+body.github-dark-theme .application-main,
+body.github-dark-theme .env-production,
+body.github-dark-theme .Box,
+body.github-dark-theme .Box-body,
+body.github-dark-theme .Box-header,
+body.github-dark-theme .pagehead,
+body.github-dark-theme .discussion-timeline,
+body.github-dark-theme .OverallSummary,
+body.github-dark-theme .main-content,
+body.github-dark-theme .site-header,
+body.github-dark-theme .site-footer,
+body.github-dark-theme .subnav,
+body.github-dark-theme .container,
+body.github-dark-theme .container-lg,
+body.github-dark-theme .container-xl {
   background-color: var(--gl-white) !important;
   border-color: var(--gl-border) !important;
 }
 
-/* Links and text - only when gitlab theme is active */
-body.gitlab-dark-theme a,
-body.gitlab-dark-theme .Header-link,
-body.gitlab-dark-theme .header-nav-link,
-body.gitlab-dark-theme .HeaderMenu-link,
-body.gitlab-dark-theme .link-gray,
-body.gitlab-dark-theme .text-gray,
-body.gitlab-dark-theme .text-gray-dark,
-body.gitlab-dark-theme .f5,
-body.gitlab-dark-theme .f6,
-body.gitlab-dark-theme .pjax-link {
+/* Links and text - only when github theme is active */
+body.github-dark-theme a,
+body.github-dark-theme .Header-link,
+body.github-dark-theme .header-nav-link,
+body.github-dark-theme .HeaderMenu-link,
+body.github-dark-theme .link-gray,
+body.github-dark-theme .text-gray,
+body.github-dark-theme .text-gray-dark,
+body.github-dark-theme .f5,
+body.github-dark-theme .f6,
+body.github-dark-theme .pjax-link {
   color: var(--gl-gray-700) !important;
 }
 
-/* Links on hover - only when gitlab theme is active */
-body.gitlab-dark-theme a:hover,
-body.gitlab-dark-theme .Header-link:hover,
-body.gitlab-dark-theme .header-nav-link:hover,
-body.gitlab-dark-theme .HeaderMenu-link:hover {
+/* Links on hover - only when github theme is active */
+body.github-dark-theme a:hover,
+body.github-dark-theme .Header-link:hover,
+body.github-dark-theme .header-nav-link:hover,
+body.github-dark-theme .HeaderMenu-link:hover {
   color: var(--gl-primary) !important;
 }
 
-/* Repository List Items - Standard Rounding - only when gitlab theme is active */
-body.gitlab-dark-theme .repo-list-item,
-body.gitlab-dark-theme li[itemprop="owns"],
-body.gitlab-dark-theme [data-testid="repository-list-item"],
-body.gitlab-dark-theme .org-repo,
-body.gitlab-dark-theme .source,
-body.gitlab-dark-theme .public,
-body.gitlab-dark-theme .private,
-body.gitlab-dark-theme .fork,
-body.gitlab-dark-theme .archived {
+/* Repository List Items - Standard Rounding - only when github theme is active */
+body.github-dark-theme .repo-list-item,
+body.github-dark-theme li[itemprop="owns"],
+body.github-dark-theme [data-testid="repository-list-item"],
+body.github-dark-theme .org-repo,
+body.github-dark-theme .source,
+body.github-dark-theme .public,
+body.github-dark-theme .private,
+body.github-dark-theme .fork,
+body.github-dark-theme .archived {
   background: var(--gl-white) !important;
   border: 1px solid var(--gl-border) !important;
   border-radius: var(--gl-radius) !important;
@@ -130,24 +132,24 @@ body.gitlab-dark-theme .archived {
   color: var(--gl-gray-700) !important;
 }
 
-body.gitlab-dark-theme .repo-list-item:hover,
-body.gitlab-dark-theme li[itemprop="owns"]:hover,
-body.gitlab-dark-theme [data-testid="repository-list-item"]:hover,
-body.gitlab-dark-theme .org-repo:hover,
-body.gitlab-dark-theme .source:hover,
-body.gitlab-dark-theme .public:hover,
-body.gitlab-dark-theme .private:hover,
-body.gitlab-dark-theme .fork:hover,
-body.gitlab-dark-theme .archived:hover {
+body.github-dark-theme .repo-list-item:hover,
+body.github-dark-theme li[itemprop="owns"]:hover,
+body.github-dark-theme [data-testid="repository-list-item"]:hover,
+body.github-dark-theme .org-repo:hover,
+body.github-dark-theme .source:hover,
+body.github-dark-theme .public:hover,
+body.github-dark-theme .private:hover,
+body.github-dark-theme .fork:hover,
+body.github-dark-theme .archived:hover {
   border-color: var(--gl-primary) !important;
   box-shadow: var(--gl-shadow) !important;
   transform: translateY(-1px) !important;
   background: var(--gl-gray-50) !important;
 }
 
-body.gitlab-dark-theme .repo-list-item h3 a,
-body.gitlab-dark-theme .wb-break-all a,
-body.gitlab-dark-theme [data-testid="repository-list-item"] a[href*="/"] {
+body.github-dark-theme .repo-list-item h3 a,
+body.github-dark-theme .wb-break-all a,
+body.github-dark-theme [data-testid="repository-list-item"] a[href*="/"] {
   color: var(--gl-gray-700) !important;
   font-weight: 600 !important;
   font-size: 16px !important;
@@ -155,25 +157,25 @@ body.gitlab-dark-theme [data-testid="repository-list-item"] a[href*="/"] {
   transition: var(--gl-transition) !important;
 }
 
-body.gitlab-dark-theme .repo-list-item h3 a:hover,
-body.gitlab-dark-theme .wb-break-all a:hover,
-body.gitlab-dark-theme [data-testid="repository-list-item"] a[href*="/"]:hover {
+body.github-dark-theme .repo-list-item h3 a:hover,
+body.github-dark-theme .wb-break-all a:hover,
+body.github-dark-theme [data-testid="repository-list-item"] a[href*="/"]:hover {
   color: var(--gl-primary) !important;
 }
 
 /* GitLab Group Cards - Clickable Cards System */
-.gitlab-cards-section {
+.github-cards-section {
   margin-bottom: 24px !important;
 }
 
-.gitlab-group-cards-container {
+.github-group-cards-container {
   display: grid !important;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
   gap: 16px !important;
   margin-bottom: 24px !important;
 }
 
-.gitlab-group-card {
+.github-group-card {
   background: var(--gl-white) !important;
   border: 1px solid var(--gl-border) !important;
   border-radius: var(--gl-radius) !important;
@@ -184,23 +186,27 @@ body.gitlab-dark-theme [data-testid="repository-list-item"] a[href*="/"]:hover {
   overflow: hidden !important;
 }
 
-.gitlab-group-card:hover {
+.github-group-card:hover {
   border-color: var(--gl-primary) !important;
   box-shadow: var(--gl-shadow) !important;
   transform: translateY(-2px) !important;
   background: var(--gl-gray-50) !important;
 }
 
-.gitlab-group-card.active {
+.github-group-card.active {
   border-color: var(--gl-primary) !important;
-  background: linear-gradient(135deg, rgba(252, 109, 38, 0.15), rgba(107, 79, 187, 0.15)) !important;
+  background: linear-gradient(
+    135deg,
+    rgba(252, 109, 38, 0.15),
+    rgba(107, 79, 187, 0.15)
+  ) !important;
   box-shadow: 0 0 0 2px rgba(252, 109, 38, 0.2) !important;
   transform: translateY(-2px) scale(1.02) !important;
 }
 
 /* Enhanced active card visual feedback */
-.gitlab-group-card.active::before {
-  content: '';
+.github-group-card.active::before {
+  content: "";
   position: absolute;
   top: -2px;
   left: -2px;
@@ -212,18 +218,22 @@ body.gitlab-dark-theme [data-testid="repository-list-item"] a[href*="/"]:hover {
   opacity: 0.1;
 }
 
-.gitlab-card-header {
+.github-card-header {
   display: flex !important;
   align-items: center !important;
   gap: 12px !important;
   flex-wrap: nowrap !important;
 }
 
-.gitlab-card-icon {
+.github-card-icon {
   flex-shrink: 0 !important;
   width: 40px !important;
   height: 40px !important;
-  background: linear-gradient(135deg, var(--gl-primary), var(--gl-secondary)) !important;
+  background: linear-gradient(
+    135deg,
+    var(--gl-primary),
+    var(--gl-secondary)
+  ) !important;
   border-radius: var(--gl-radius-full) !important;
   display: flex !important;
   align-items: center !important;
@@ -231,12 +241,12 @@ body.gitlab-dark-theme [data-testid="repository-list-item"] a[href*="/"]:hover {
   color: var(--gl-white) !important;
 }
 
-.gitlab-card-icon svg {
+.github-card-icon svg {
   width: 20px !important;
   height: 20px !important;
 }
 
-.gitlab-card-title-count {
+.github-card-title-count {
   flex: 1 !important;
   display: flex !important;
   align-items: center !important;
@@ -244,7 +254,7 @@ body.gitlab-dark-theme [data-testid="repository-list-item"] a[href*="/"]:hover {
   min-width: 0 !important;
 }
 
-.gitlab-card-title {
+.github-card-title {
   margin: 0 !important;
   color: var(--gl-gray-700) !important;
   font-size: 16px !important;
@@ -255,7 +265,7 @@ body.gitlab-dark-theme [data-testid="repository-list-item"] a[href*="/"]:hover {
   text-overflow: ellipsis !important;
 }
 
-.gitlab-card-count {
+.github-card-count {
   color: var(--gl-gray-500) !important;
   font-size: 12px !important;
   font-weight: 500 !important;
@@ -267,7 +277,7 @@ body.gitlab-dark-theme [data-testid="repository-list-item"] a[href*="/"]:hover {
 }
 
 /* Repositories Section */
-.gitlab-repos-section {
+.github-repos-section {
   background: var(--gl-white) !important;
   border-radius: var(--gl-radius) !important;
   padding: 20px !important;
@@ -275,12 +285,12 @@ body.gitlab-dark-theme [data-testid="repository-list-item"] a[href*="/"]:hover {
   box-shadow: var(--gl-shadow-sm) !important;
 }
 
-.gitlab-repo-container {
+.github-repo-container {
   display: block !important;
 }
 
-.gitlab-repo-container[data-group-id="all"],
-.gitlab-repo-container[data-group-id] {
+.github-repo-container[data-group-id="all"],
+.github-repo-container[data-group-id] {
   animation: fadeIn 0.3s ease-in-out !important;
 }
 
@@ -296,7 +306,7 @@ body.gitlab-dark-theme [data-testid="repository-list-item"] a[href*="/"]:hover {
 }
 
 /* Group Controls - Fully Rounded Buttons with Compact Layout */
-.gitlab-group-controls {
+.github-group-controls {
   display: flex !important;
   gap: 8px !important;
   margin-bottom: 16px !important;
@@ -309,7 +319,7 @@ body.gitlab-dark-theme [data-testid="repository-list-item"] a[href*="/"]:hover {
   flex-wrap: wrap !important;
 }
 
-.gitlab-control-btn {
+.github-control-btn {
   background: var(--gl-white) !important;
   border: 1px solid var(--gl-border) !important;
   color: var(--gl-gray-700) !important;
@@ -328,13 +338,13 @@ body.gitlab-dark-theme [data-testid="repository-list-item"] a[href*="/"]:hover {
   white-space: nowrap !important;
 }
 
-.gitlab-control-btn svg {
+.github-control-btn svg {
   flex-shrink: 0 !important;
   width: 14px !important;
   height: 14px !important;
 }
 
-.gitlab-control-btn:hover {
+.github-control-btn:hover {
   background: var(--gl-gray-50) !important;
   border-color: var(--gl-primary) !important;
   color: var(--gl-primary) !important;
@@ -342,20 +352,20 @@ body.gitlab-dark-theme [data-testid="repository-list-item"] a[href*="/"]:hover {
   box-shadow: var(--gl-shadow) !important;
 }
 
-.gitlab-manage-btn {
+.github-manage-btn {
   background: var(--gl-primary) !important;
   border-color: var(--gl-primary) !important;
   color: var(--gl-white) !important;
 }
 
-.gitlab-manage-btn:hover {
+.github-manage-btn:hover {
   background: var(--gl-primary-dark) !important;
   border-color: var(--gl-primary-dark) !important;
   color: var(--gl-white) !important;
 }
 
 /* Group Manager Modal */
-.gitlab-group-manager {
+.github-group-manager {
   position: fixed !important;
   top: 0 !important;
   left: 0 !important;
@@ -369,7 +379,7 @@ body.gitlab-dark-theme [data-testid="repository-list-item"] a[href*="/"]:hover {
   backdrop-filter: blur(8px) !important;
 }
 
-.gitlab-manager-content {
+.github-manager-content {
   background: var(--gl-white) !important;
   border-radius: var(--gl-radius-lg) !important;
   box-shadow: var(--gl-shadow-lg) !important;
@@ -380,29 +390,33 @@ body.gitlab-dark-theme [data-testid="repository-list-item"] a[href*="/"]:hover {
   border: 1px solid var(--gl-border) !important;
 }
 
-.gitlab-manager-content h3 {
+.github-manager-content h3 {
   margin: 0 !important;
   padding: 24px 24px 20px !important;
   border-bottom: 1px solid var(--gl-border) !important;
   color: var(--gl-gray-700) !important;
   font-size: 18px !important;
   font-weight: 600 !important;
-  background: linear-gradient(135deg, rgba(252, 109, 38, 0.1), rgba(107, 79, 187, 0.1)) !important;
+  background: linear-gradient(
+    135deg,
+    rgba(252, 109, 38, 0.1),
+    rgba(107, 79, 187, 0.1)
+  ) !important;
 }
 
-.gitlab-manager-body {
+.github-manager-body {
   padding: 24px !important;
 }
 
-.gitlab-group-list h4,
-.gitlab-add-group h4 {
+.github-group-list h4,
+.github-add-group h4 {
   margin: 0 0 16px 0 !important;
   color: var(--gl-gray-700) !important;
   font-size: 14px !important;
   font-weight: 600 !important;
 }
 
-.gitlab-group-item {
+.github-group-item {
   display: flex !important;
   justify-content: space-between !important;
   align-items: center !important;
@@ -414,12 +428,12 @@ body.gitlab-dark-theme [data-testid="repository-list-item"] a[href*="/"]:hover {
   transition: var(--gl-transition) !important;
 }
 
-.gitlab-group-item:hover {
+.github-group-item:hover {
   background: var(--gl-gray-100) !important;
   transform: translateX(4px) !important;
 }
 
-.gitlab-remove-group {
+.github-remove-group {
   background: #ff4757 !important;
   border: none !important;
   color: var(--gl-white) !important;
@@ -437,19 +451,19 @@ body.gitlab-dark-theme [data-testid="repository-list-item"] a[href*="/"]:hover {
   position: relative !important;
 }
 
-.gitlab-remove-group::before {
-  content: '×' !important;
+.github-remove-group::before {
+  content: "×" !important;
   font-size: 14px !important;
   line-height: 1 !important;
 }
 
-.gitlab-remove-group:hover {
+.github-remove-group:hover {
   background: #ff3838 !important;
   transform: scale(1.2) !important;
   box-shadow: var(--gl-shadow) !important;
 }
 
-.gitlab-no-groups {
+.github-no-groups {
   color: var(--gl-gray-500) !important;
   font-style: italic !important;
   text-align: center !important;
@@ -479,7 +493,11 @@ body.gitlab-dark-theme [data-testid="repository-list-item"] a[href*="/"]:hover {
 }
 
 #add-group-btn {
-  background: linear-gradient(135deg, var(--gl-primary), var(--gl-secondary)) !important;
+  background: linear-gradient(
+    135deg,
+    var(--gl-primary),
+    var(--gl-secondary)
+  ) !important;
   border: none !important;
   color: var(--gl-white) !important;
   padding: 12px 20px !important;
@@ -494,12 +512,16 @@ body.gitlab-dark-theme [data-testid="repository-list-item"] a[href*="/"]:hover {
 }
 
 #add-group-btn:hover {
-  background: linear-gradient(135deg, var(--gl-primary-dark), var(--gl-secondary-dark)) !important;
+  background: linear-gradient(
+    135deg,
+    var(--gl-primary-dark),
+    var(--gl-secondary-dark)
+  ) !important;
   transform: translateY(-1px) !important;
   box-shadow: var(--gl-shadow) !important;
 }
 
-.gitlab-manager-footer {
+.github-manager-footer {
   padding: 20px 24px !important;
   border-top: 1px solid var(--gl-border) !important;
   text-align: right !important;
@@ -687,50 +709,50 @@ code {
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  .gitlab-group-controls {
+  .github-group-controls {
     flex-direction: row !important;
     flex-wrap: wrap !important;
     padding: 8px 12px !important;
   }
-  
-  .gitlab-control-btn {
+
+  .github-control-btn {
     font-size: 11px !important;
     padding: 5px 8px !important;
     gap: 4px !important;
   }
-  
-  .gitlab-control-btn svg {
+
+  .github-control-btn svg {
     width: 12px !important;
     height: 12px !important;
   }
-  
-  .gitlab-group-cards-container {
+
+  .github-group-cards-container {
     grid-template-columns: 1fr !important;
     gap: 12px !important;
   }
-  
-  .gitlab-manager-content {
+
+  .github-manager-content {
     width: 95% !important;
     margin: 20px !important;
   }
-  
+
   .repo-list-item,
   li[itemprop="owns"],
   [data-testid="repository-list-item"] {
     padding: 12px 16px !important;
   }
-  
-  .gitlab-group-card {
+
+  .github-group-card {
     padding: 16px !important;
   }
-  
-  .gitlab-card-title-count {
+
+  .github-card-title-count {
     flex-direction: column !important;
     align-items: flex-start !important;
     gap: 4px !important;
   }
-  
-  .gitlab-card-count {
+
+  .github-card-count {
     margin-left: 0 !important;
     align-self: flex-start !important;
   }
@@ -738,18 +760,18 @@ code {
 
 /* Ensure dark theme persists on all pages */
 @media (prefers-color-scheme: light) {
-  html.gitlab-dark-theme,
-  body.gitlab-dark-theme,
-  .gitlab-dark-theme {
+  html.github-dark-theme,
+  body.github-dark-theme,
+  .github-dark-theme {
     background-color: #0d0e11 !important;
     color: #ceced9 !important;
   }
 }
 
 @media (prefers-color-scheme: dark) {
-  html.gitlab-dark-theme,
-  body.gitlab-dark-theme,
-  .gitlab-dark-theme {
+  html.github-dark-theme,
+  body.github-dark-theme,
+  .github-dark-theme {
     background-color: #0d0e11 !important;
     color: #ceced9 !important;
   }

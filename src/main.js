@@ -191,7 +191,7 @@ class GithubExplorer {
    * Add group controls to the page.
    */
   addGroupControls() {
-    const existingControls = document.querySelector(".gitlab-group-controls");
+    const existingControls = document.querySelector(".github-group-controls");
     if (existingControls) return;
 
     const repoSections = [
@@ -208,7 +208,7 @@ class GithubExplorer {
       if (
         container &&
         !container.previousElementSibling?.classList.contains(
-          "gitlab-group-controls",
+          "github-group-controls",
         )
       ) {
         const controls = new GroupControls(
@@ -303,9 +303,9 @@ class GithubExplorer {
    */
   showGroupRepos(groupId, card) {
     const groupedContainer =
-      card.closest(".gitlab-grouped-repositories") ||
-      card.parentElement.closest(".gitlab-grouped-repositories") ||
-      document.querySelector(".gitlab-grouped-repositories");
+      card.closest(".github-grouped-repositories") ||
+      card.parentElement.closest(".github-grouped-repositories") ||
+      document.querySelector(".github-grouped-repositories");
 
     console.log(`[GithubExplorer] Showing repos for group: ${groupId}`);
 
@@ -316,7 +316,7 @@ class GithubExplorer {
         `[GithubExplorer] Could not find grouped repositories container`,
       );
       const allGroupedContainers = document.querySelectorAll(
-        ".gitlab-grouped-repositories",
+        ".github-grouped-repositories",
       );
       if (allGroupedContainers.length > 0) {
         this.groupDisplayManager.showGroupRepos(

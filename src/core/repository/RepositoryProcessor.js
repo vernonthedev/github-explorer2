@@ -2,8 +2,8 @@
  * Repository Processor - Handles main repository processing logic.
  */
 
-import { GroupCard } from '../../ui/components/GroupCard.js';
-import { GroupManager } from './GroupManager.js';
+import { GroupCard } from "../../ui/components/GroupCard.js";
+import { GroupManager } from "./GroupManager.js";
 
 export class RepositoryProcessor {
   constructor(groupManager, onShowGroupRepos) {
@@ -18,7 +18,7 @@ export class RepositoryProcessor {
    */
   createGroupCards(container, items) {
     const groups = this.groupManager.extractGroups(items);
-    
+
     if (groups.size <= 1) {
       this.displayAllRepos(container, items);
       return;
@@ -26,24 +26,29 @@ export class RepositoryProcessor {
 
     const originalContent = container.innerHTML;
     const originalClasses = container.className;
-    
+
     try {
-      container.innerHTML = '';
-      container.classList.add('gitlab-grouped-repositories');
+      container.innerHTML = "";
+      container.classList.add("github-grouped-repositories");
 
       const fragment = document.createDocumentFragment();
-      
+
       const groupCardsSection = this.createGroupCardsSection(groups, container);
       fragment.appendChild(groupCardsSection);
 
-      const repoContainersSection = this.createRepoContainers(groups, container);
+      const repoContainersSection = this.createRepoContainers(
+        groups,
+        container,
+      );
       fragment.appendChild(repoContainersSection);
 
       container.appendChild(fragment);
       this.autoShowFirstGroup(container);
-
     } catch (error) {
-      console.error('[RepositoryProcessor] Error creating group cards, reverting to original content:', error);
+      console.error(
+        "[RepositoryProcessor] Error creating group cards, reverting to original content:",
+        error,
+      );
       container.innerHTML = originalContent;
       container.className = originalClasses;
       this.displayAllRepos(container, items);
@@ -56,25 +61,26 @@ export class RepositoryProcessor {
    * @param {Element[]} items - Repository item elements.
    */
   displayAllRepos(container, items) {
-    if (container.dataset.gitlabProcessed === 'true') {
+    if (container.dataset.gitlabProcessed === "true") {
       return;
     }
 
     const fragment = document.createDocumentFragment();
-    
-    items.forEach(item => {
+
+    items.forEach((item) => {
       fragment.appendChild(item);
     });
 
-    const nonRepoItems = Array.from(container.children).filter(child => 
-      !items.includes(child) && 
-      !child.classList.contains('gitlab-cards-section') &&
-      !child.classList.contains('gitlab-repos-section')
+    const nonRepoItems = Array.from(container.children).filter(
+      (child) =>
+        !items.includes(child) &&
+        !child.classList.contains("github-cards-section") &&
+        !child.classList.contains("github-repos-section"),
     );
 
-    nonRepoItems.forEach(item => fragment.appendChild(item));
+    nonRepoItems.forEach((item) => fragment.appendChild(item));
 
-    container.innerHTML = '';
+    container.innerHTML = "";
     container.appendChild(fragment);
   }
 
@@ -85,13 +91,18 @@ export class RepositoryProcessor {
    * @returns {Element} Group cards section element.
    */
   createGroupCardsSection(groups, container) {
-    const section = document.createElement('div');
-    section.className = 'gitlab-cards-section';
+    const section = document.createElement("div");
+    section.className = "github-cards-section";
 
-    const containerDiv = document.createElement('div');
-    containerDiv.className = 'gitlab-group-cards-container';
+    const containerDiv = document.createElement("div");
+    containerDiv.className = "github-group-cards-container";
 
-    const allReposCard = new GroupCard('All Repositories', Array.from(groups.values()).flat(), 'all', this.onShowGroupRepos);
+    const allReposCard = new GroupCard(
+      "All Repositories",
+      Array.from(groups.values()).flat(),
+      "all",
+      this.onShowGroupRepos,
+    );
     containerDiv.appendChild(allReposCard.create());
 
     Array.from(groups.entries()).forEach(([name, items]) => {
@@ -110,29 +121,31 @@ export class RepositoryProcessor {
    * @returns {Element} Repository containers section element.
    */
   createRepoContainers(groups, container) {
-    const section = document.createElement('div');
-    section.className = 'gitlab-repos-section';
+    const section = document.createElement("div");
+    section.className = "github-repos-section";
 
     const allReposContainer = document.createElement(container.tagName);
     allReposContainer.className = container.className;
-    allReposContainer.classList.add('gitlab-repo-container');
-    allReposContainer.dataset.groupId = 'all';
-    allReposContainer.style.display = 'none';
+    allReposContainer.classList.add("github-repo-container");
+    allReposContainer.dataset.groupId = "all";
+    allReposContainer.style.display = "none";
 
-    Array.from(groups.values()).flat().forEach(item => {
-      allReposContainer.appendChild(item.cloneNode(true));
-    });
+    Array.from(groups.values())
+      .flat()
+      .forEach((item) => {
+        allReposContainer.appendChild(item.cloneNode(true));
+      });
 
     section.appendChild(allReposContainer);
 
     Array.from(groups.entries()).forEach(([name, items]) => {
       const groupContainer = document.createElement(container.tagName);
       groupContainer.className = container.className;
-      groupContainer.classList.add('gitlab-repo-container');
+      groupContainer.classList.add("github-repo-container");
       groupContainer.dataset.groupId = name;
-      groupContainer.style.display = 'none';
+      groupContainer.style.display = "none";
 
-      items.forEach(item => {
+      items.forEach((item) => {
         groupContainer.appendChild(item);
       });
 
@@ -147,18 +160,30 @@ export class RepositoryProcessor {
    * @param {Element} container - Container element.
    */
   autoShowFirstGroup(container) {
-    const firstGroup = Array.from(this.groupManager.extractGroups([]).keys())[0] || 'all';
-    console.log(`[RepositoryProcessor] Auto-showing first group: ${firstGroup}`);
-    
+    const firstGroup =
+      Array.from(this.groupManager.extractGroups([]).keys())[0] || "all";
+    console.log(
+      `[RepositoryProcessor] Auto-showing first group: ${firstGroup}`,
+    );
+
     setTimeout(() => {
       console.log(`[RepositoryProcessor] Attempting to show first group...`);
-      const firstCard = container.querySelector(`.gitlab-group-card[data-group-id="${firstGroup}"]`);
+      const firstCard = container.querySelector(
+        `.github-group-card[data-group-id="${firstGroup}"]`,
+      );
       if (firstCard) {
-        console.log(`[RepositoryProcessor] Found first group card, simulating click`);
+        console.log(
+          `[RepositoryProcessor] Found first group card, simulating click`,
+        );
         firstCard.click();
       } else {
-        console.error(`[RepositoryProcessor] Could not find first group card: ${firstGroup}`);
-        console.log(`[RepositoryProcessor] Available cards:`, container.querySelectorAll('.gitlab-group-card'));
+        console.error(
+          `[RepositoryProcessor] Could not find first group card: ${firstGroup}`,
+        );
+        console.log(
+          `[RepositoryProcessor] Available cards:`,
+          container.querySelectorAll(".github-group-card"),
+        );
       }
     }, 200);
   }
@@ -170,7 +195,7 @@ export class RepositoryProcessor {
    */
   createGroupCards(container, items) {
     const groups = this.groupManager.extractGroups(items);
-    
+
     if (groups.size <= 1) {
       this.displayAllRepos(container, items);
       return;
@@ -179,28 +204,33 @@ export class RepositoryProcessor {
     // Store original content and clear container safely.
     const originalContent = container.innerHTML;
     const originalClasses = container.className;
-    
+
     try {
-      container.innerHTML = '';
-      container.classList.add('gitlab-grouped-repositories');
+      container.innerHTML = "";
+      container.classList.add("github-grouped-repositories");
 
       const fragment = document.createDocumentFragment();
-      
+
       // Create group cards section.
       const groupCardsSection = this.createGroupCardsSection(groups, container);
       fragment.appendChild(groupCardsSection);
 
       // Create hidden repo containers for each group.
-      const repoContainersSection = this.createRepoContainers(groups, container);
+      const repoContainersSection = this.createRepoContainers(
+        groups,
+        container,
+      );
       fragment.appendChild(repoContainersSection);
 
       container.appendChild(fragment);
 
       // Show the first group by default.
       this.autoShowFirstGroup(container);
-
     } catch (error) {
-      console.error('[RepositoryProcessor] Error creating group cards, reverting to original content:', error);
+      console.error(
+        "[RepositoryProcessor] Error creating group cards, reverting to original content:",
+        error,
+      );
       container.innerHTML = originalContent;
       container.className = originalClasses;
       this.displayAllRepos(container, items);
@@ -209,38 +239,44 @@ export class RepositoryProcessor {
 
   displayAllRepos(container, items) {
     // Only modify if we haven't already processed this container.
-    if (container.dataset.gitlabProcessed === 'true') {
+    if (container.dataset.gitlabProcessed === "true") {
       return;
     }
 
     const fragment = document.createDocumentFragment();
-    
-    items.forEach(item => {
+
+    items.forEach((item) => {
       fragment.appendChild(item);
     });
 
     // Preserve non-repo items.
-    const nonRepoItems = Array.from(container.children).filter(child => 
-      !items.includes(child) && 
-      !child.classList.contains('gitlab-cards-section') &&
-      !child.classList.contains('gitlab-repos-section')
+    const nonRepoItems = Array.from(container.children).filter(
+      (child) =>
+        !items.includes(child) &&
+        !child.classList.contains("github-cards-section") &&
+        !child.classList.contains("github-repos-section"),
     );
 
-    nonRepoItems.forEach(item => fragment.appendChild(item));
+    nonRepoItems.forEach((item) => fragment.appendChild(item));
 
-    container.innerHTML = '';
+    container.innerHTML = "";
     container.appendChild(fragment);
   }
 
   createGroupCardsSection(groups, container) {
-    const section = document.createElement('div');
-    section.className = 'gitlab-cards-section';
+    const section = document.createElement("div");
+    section.className = "github-cards-section";
 
-    const containerDiv = document.createElement('div');
-    containerDiv.className = 'gitlab-group-cards-container';
+    const containerDiv = document.createElement("div");
+    containerDiv.className = "github-group-cards-container";
 
     // Add "All Repositories" card.
-    const allReposCard = new GroupCard('All Repositories', Array.from(groups.values()).flat(), 'all', this.onShowGroupRepos);
+    const allReposCard = new GroupCard(
+      "All Repositories",
+      Array.from(groups.values()).flat(),
+      "all",
+      this.onShowGroupRepos,
+    );
     containerDiv.appendChild(allReposCard.create());
 
     // Add group cards.
@@ -254,19 +290,21 @@ export class RepositoryProcessor {
   }
 
   createRepoContainers(groups, container) {
-    const section = document.createElement('div');
-    section.className = 'gitlab-repos-section';
+    const section = document.createElement("div");
+    section.className = "github-repos-section";
 
     // Create container for "All Repositories".
     const allReposContainer = document.createElement(container.tagName);
     allReposContainer.className = container.className;
-    allReposContainer.classList.add('gitlab-repo-container');
-    allReposContainer.dataset.groupId = 'all';
-    allReposContainer.style.display = 'none';
+    allReposContainer.classList.add("github-repo-container");
+    allReposContainer.dataset.groupId = "all";
+    allReposContainer.style.display = "none";
 
-    Array.from(groups.values()).flat().forEach(item => {
-      allReposContainer.appendChild(item.cloneNode(true));
-    });
+    Array.from(groups.values())
+      .flat()
+      .forEach((item) => {
+        allReposContainer.appendChild(item.cloneNode(true));
+      });
 
     section.appendChild(allReposContainer);
 
@@ -274,11 +312,11 @@ export class RepositoryProcessor {
     Array.from(groups.entries()).forEach(([name, items]) => {
       const groupContainer = document.createElement(container.tagName);
       groupContainer.className = container.className;
-      groupContainer.classList.add('gitlab-repo-container');
+      groupContainer.classList.add("github-repo-container");
       groupContainer.dataset.groupId = name;
-      groupContainer.style.display = 'none';
+      groupContainer.style.display = "none";
 
-      items.forEach(item => {
+      items.forEach((item) => {
         groupContainer.appendChild(item);
       });
 
@@ -289,19 +327,31 @@ export class RepositoryProcessor {
   }
 
   autoShowFirstGroup(container) {
-    const firstGroup = Array.from(this.groupManager.extractGroups([]).keys())[0] || 'all';
-    console.log(`[RepositoryProcessor] Auto-showing first group: ${firstGroup}`);
-    
+    const firstGroup =
+      Array.from(this.groupManager.extractGroups([]).keys())[0] || "all";
+    console.log(
+      `[RepositoryProcessor] Auto-showing first group: ${firstGroup}`,
+    );
+
     // Wait a bit for DOM to settle, then simulate first group click.
     setTimeout(() => {
       console.log(`[RepositoryProcessor] Attempting to show first group...`);
-      const firstCard = container.querySelector(`.gitlab-group-card[data-group-id="${firstGroup}"]`);
+      const firstCard = container.querySelector(
+        `.github-group-card[data-group-id="${firstGroup}"]`,
+      );
       if (firstCard) {
-        console.log(`[RepositoryProcessor] Found first group card, simulating click`);
+        console.log(
+          `[RepositoryProcessor] Found first group card, simulating click`,
+        );
         firstCard.click();
       } else {
-        console.error(`[RepositoryProcessor] Could not find first group card: ${firstGroup}`);
-        console.log(`[RepositoryProcessor] Available cards:`, container.querySelectorAll('.gitlab-group-card'));
+        console.error(
+          `[RepositoryProcessor] Could not find first group card: ${firstGroup}`,
+        );
+        console.log(
+          `[RepositoryProcessor] Available cards:`,
+          container.querySelectorAll(".github-group-card"),
+        );
       }
     }, 200);
   }
