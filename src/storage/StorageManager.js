@@ -61,8 +61,8 @@ class StorageManager {
         await this.db.settings.add({ key, value });
       }
 
-      localStorage.setItem(`gitlab_theme_${key}`, JSON.stringify(value));
-      this.setCookie(`gitlab_theme_${key}`, JSON.stringify(value), 365);
+      localStorage.setItem(`github_theme_${key}`, JSON.stringify(value));
+      this.setCookie(`github_theme_${key}`, JSON.stringify(value), 365);
 
       console.log(`[Storage] Saved setting: ${key}`);
     } catch (error) {
@@ -84,10 +84,10 @@ class StorageManager {
         if (setting) return setting.value;
       }
 
-      const localValue = localStorage.getItem(`gitlab_theme_${key}`);
+      const localValue = localStorage.getItem(`github_theme_${key}`);
       if (localValue) return JSON.parse(localValue);
 
-      const cookieValue = this.getCookie(`gitlab_theme_${key}`);
+      const cookieValue = this.getCookie(`github_theme_${key}`);
       if (cookieValue) return JSON.parse(cookieValue);
 
       return defaultValue;
@@ -104,8 +104,8 @@ class StorageManager {
    */
   saveSettingFallback(key, value) {
     try {
-      localStorage.setItem(`gitlab_theme_${key}`, JSON.stringify(value));
-      this.setCookie(`gitlab_theme_${key}`, JSON.stringify(value), 365);
+      localStorage.setItem(`github_theme_${key}`, JSON.stringify(value));
+      this.setCookie(`github_theme_${key}`, JSON.stringify(value), 365);
     } catch (error) {
       console.error("[Storage] Fallback storage failed:", error);
     }

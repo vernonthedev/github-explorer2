@@ -61,7 +61,7 @@ export class RepositoryProcessor {
    * @param {Element[]} items - Repository item elements.
    */
   displayAllRepos(container, items) {
-    if (container.dataset.gitlabProcessed === "true") {
+    if (container.dataset.githubProcessed === "true") {
       return;
     }
 
@@ -239,7 +239,7 @@ export class RepositoryProcessor {
 
   displayAllRepos(container, items) {
     // Only modify if we haven't already processed this container.
-    if (container.dataset.gitlabProcessed === "true") {
+    if (container.dataset.githubProcessed === "true") {
       return;
     }
 

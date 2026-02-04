@@ -170,13 +170,13 @@ class GithubExplorer {
         const items = this.repositoryFinder.findRepositoryItems(container);
 
         if (items.length > 0) {
-          if (!container.dataset.gitlabProcessed) {
+          if (!container.dataset.githubProcessed) {
             if (this.groupingEnabled && this.groupManager) {
               this.repositoryProcessor.createGroupCards(container, items);
             } else {
               this.repositoryProcessor.displayAllRepos(container, items);
             }
-            container.dataset.gitlabProcessed = "true";
+            container.dataset.githubProcessed = "true";
           }
         }
       });

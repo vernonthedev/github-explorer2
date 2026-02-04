@@ -13,7 +13,7 @@ A browser extension that reskins GitHub.com to add groups functionality to organ
 ## Features
 
 - **Repository Groups**: Automatically groups repositories based on naming convention (everything before first hyphen)
-- **Modern Design**: Clean, distraction-free interface inspired by GitLab's design language
+- **Modern Design**: Clean, distraction-free interface inspired by github's design language
 - **Preserved Functionality**: All native GitHub features remain intact
 
 ## Installation
@@ -42,7 +42,7 @@ A browser extension that reskins GitHub.com to add groups functionality to organ
 
 ## Design System
 
-The extension implements GitLab's color palette:
+The extension implements github's color palette:
 
 - **Primary Navy**: `#292961`
 - **Accent Orange**: `#e24329`

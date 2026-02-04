@@ -163,7 +163,7 @@ body.github-dark-theme [data-testid="repository-list-item"] a[href*="/"]:hover {
   color: var(--gl-primary) !important;
 }
 
-/* GitLab Group Cards - Clickable Cards System */
+/* github Group Cards - Clickable Cards System */
 .github-cards-section {
   margin-bottom: 24px !important;
 }
@@ -548,7 +548,7 @@ body.github-dark-theme [data-testid="repository-list-item"] a[href*="/"]:hover {
   box-shadow: var(--gl-shadow) !important;
 }
 
-/* Buttons - Fully Rounded GitLab Style */
+/* Buttons - Fully Rounded github Style */
 .btn-primary,
 .Button--primary {
   background: var(--gl-primary) !important;
