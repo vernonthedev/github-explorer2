@@ -1,5 +1,5 @@
 ```text
- ██████╗ ██╗████████╗██╗  ██╗██╗   ██╗██████╗     ███████╗██╗  ██╗██████╗ ██╗      ██████╗ ██████╗ ███████╗██████╗ 
+ ██████╗ ██╗████████╗██╗  ██╗██╗   ██╗██████╗     ███████╗██╗  ██╗██████╗ ██╗      ██████╗ ██████╗ ███████╗██████╗
 ██╔════╝ ██║╚══██╔══╝██║  ██║██║   ██║██╔══██╗    ██╔════╝╚██╗██╔╝██╔══██╗██║     ██╔═══██╗██╔══██╗██╔════╝██╔══██╗
 ██║  ███╗██║   ██║   ███████║██║   ██║██████╔╝    █████╗   ╚███╔╝ ██████╔╝██║     ██║   ██║██████╔╝█████╗  ██████╔╝
 ██║   ██║██║   ██║   ██╔══██║██║   ██║██╔══██╗    ██╔══╝   ██╔██╗ ██╔═══╝ ██║     ██║   ██║██╔══██╗██╔══╝  ██╔══██╗
@@ -58,11 +58,9 @@ Once installed, the extension automatically:
 2. Groups your repositories automatically
 3. Maintains all GitHub functionality
 
-## Troubleshooting
+## Star History
 
-- **Groups not appearing?**: Check that repository names follow the `group-name` convention
-- **Styling issues?**: Refresh the page after installation
-- **Performance problems?**: The extension includes debouncing and cleanup mechanisms
+[![Star History Chart](https://api.star-history.com/svg?repos=vernonthedev/github-explorer2&type=date&legend=top-left)](https://www.star-history.com/#vernonthedev/github-explorer2&type=date&legend=top-left)
 
 ---
 
