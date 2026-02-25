@@ -18,15 +18,15 @@ class ThemeManager {
    * Apply dark theme to the document.
    */
   applyDarkTheme() {
-    document.body.classList.add('gitlab-dark-theme');
-    document.documentElement.classList.add('gitlab-dark-theme');
-    
-    if (!document.querySelector('#gitlab-dark-theme-forcer')) {
-      const style = document.createElement('style');
-      style.id = 'gitlab-dark-theme-forcer';
+    document.body.classList.add("github-dark-theme");
+    document.documentElement.classList.add("github-dark-theme");
+
+    if (!document.querySelector("#github-dark-theme-forcer")) {
+      const style = document.createElement("style");
+      style.id = "github-dark-theme-forcer";
       style.textContent = `
         body, html { background-color: #0d0e11 !important; }
-        .gitlab-dark-theme { background-color: #0d0e11 !important; }
+        .github-dark-theme { background-color: #0d0e11 !important; }
       `;
       document.head.appendChild(style);
     }
@@ -36,10 +36,10 @@ class ThemeManager {
    * Remove dark theme from the document.
    */
   removeDarkTheme() {
-    document.body.classList.remove('gitlab-dark-theme');
-    document.documentElement.classList.remove('gitlab-dark-theme');
-    
-    const forcer = document.querySelector('#gitlab-dark-theme-forcer');
+    document.body.classList.remove("github-dark-theme");
+    document.documentElement.classList.remove("github-dark-theme");
+
+    const forcer = document.querySelector("#github-dark-theme-forcer");
     if (forcer) {
       forcer.remove();
     }

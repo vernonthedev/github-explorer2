@@ -1,24 +1,24 @@
 /**
- * GitHub GitLab Dark Theme & Groups Extension - Main Entry Point.
+ * @name GitHub-Explorer2
  * @author vernonthedev.
- * @description Transforms GitHub to GitLab's dark theme with intelligent repository grouping and card-based management.
+ * @description Transforms GitHub with intelligent repository grouping and card-based management.
  */
 
-const StorageManager = require('./storage/StorageManager.js');
-const ThemeManager = require('./core/theme/ThemeManager.js');
-const PageDetector = require('./utils/PageDetector.js');
-const NavigationManager = require('./utils/NavigationManager.js');
-const RepositoryFinder = require('./core/repository/RepositoryFinder.js');
-const GroupManager = require('./core/repository/GroupManager.js');
-const RepositoryProcessor = require('./core/repository/RepositoryProcessor.js');
-const GroupDisplayManager = require('./core/repository/GroupDisplayManager.js');
-const GroupControls = require('./ui/components/GroupControls.js');
-const GroupManagerModal = require('./ui/managers/GroupManagerModal.js');
+const StorageManager = require("./storage/StorageManager.js");
+const ThemeManager = require("./core/theme/ThemeManager.js");
+const PageDetector = require("./utils/PageDetector.js");
+const NavigationManager = require("./utils/NavigationManager.js");
+const RepositoryFinder = require("./core/repository/RepositoryFinder.js");
+const GroupManager = require("./core/repository/GroupManager.js");
+const RepositoryProcessor = require("./core/repository/RepositoryProcessor.js");
+const GroupDisplayManager = require("./core/repository/GroupDisplayManager.js");
+const GroupControls = require("./ui/components/GroupControls.js");
+const GroupManagerModal = require("./ui/managers/GroupManagerModal.js");
 
 /**
  * Main extension class that orchestrates all functionality.
  */
-class GitHubGitLabTheme {
+class GithubExplorer {
   constructor() {
     this.storage = new StorageManager();
     this.themeManager = new ThemeManager();
@@ -27,7 +27,7 @@ class GitHubGitLabTheme {
     this.repositoryProcessor = null;
     this.groupDisplayManager = new GroupDisplayManager();
     this.navigationManager = null;
-    
+
     this.isProcessing = false;
     this.debounceTimer = null;
     this.groupingEnabled = true;
@@ -39,25 +39,30 @@ class GitHubGitLabTheme {
    * Initialize the extension.
    */
   async init() {
-    console.log('[GitHubGitLabTheme] Initializing extension...');
-    
+    console.log("[GithubExplorer] Initializing extension...");
+
     await this.storage.init();
     this.themeManager.init();
-    
+
     await this.loadSettings();
-    
+
     this.groupManager = new GroupManager(this.customGroups);
-    this.repositoryProcessor = new RepositoryProcessor(this.groupManager, this.showGroupRepos.bind(this));
-    
-    this.navigationManager = new NavigationManager(this.handleNavigationChange.bind(this));
+    this.repositoryProcessor = new RepositoryProcessor(
+      this.groupManager,
+      this.showGroupRepos.bind(this),
+    );
+
+    this.navigationManager = new NavigationManager(
+      this.handleNavigationChange.bind(this),
+    );
     this.navigationManager.init();
-    
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', () => this.run());
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", () => this.run());
     } else {
       this.run();
     }
-    
+
     setTimeout(() => this.run(), 1000);
   }
 
@@ -65,14 +70,17 @@ class GitHubGitLabTheme {
    * Load user settings from storage.
    */
   async loadSettings() {
-    this.groupingEnabled = await this.storage.loadSetting('groupingEnabled', true);
-    
-    const customGroups = await this.storage.loadSetting('customGroups', []);
+    this.groupingEnabled = await this.storage.loadSetting(
+      "groupingEnabled",
+      true,
+    );
+
+    const customGroups = await this.storage.loadSetting("customGroups", []);
     this.customGroups = new Set(customGroups);
-    
-    console.log('[GitHubGitLabTheme] Settings loaded:', { 
+
+    console.log("[GithubExplorer] Settings loaded:", {
       groupingEnabled: this.groupingEnabled,
-      customGroups: Array.from(this.customGroups)
+      customGroups: Array.from(this.customGroups),
     });
   }
 
@@ -81,17 +89,19 @@ class GitHubGitLabTheme {
    */
   run() {
     if (!PageDetector.isRepositoryPage()) {
-      console.log('[GitHubGitLabTheme] Not a repository page, skipping processing');
+      console.log(
+        "[GithubExplorer] Not a repository page, skipping processing",
+      );
       return;
     }
-    
+
     this.themeManager.applyDarkTheme();
-    
+
     const pageType = PageDetector.getPageType();
-    if (pageType === 'organization') {
-      console.log('[GitHubGitLabTheme] Organization page detected');
+    if (pageType === "organization") {
+      console.log("[GithubExplorer] Organization page detected");
     }
-    
+
     this.setupMutationObserver();
     this.addGroupControls();
     this.processRepositories();
@@ -108,7 +118,7 @@ class GitHubGitLabTheme {
 
       let shouldProcess = false;
       for (const mutation of mutations) {
-        if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+        if (mutation.type === "childList" && mutation.addedNodes.length > 0) {
           shouldProcess = true;
           break;
         }
@@ -126,19 +136,19 @@ class GitHubGitLabTheme {
     });
 
     const targetSelectors = [
-      '#user-repositories-list',
-      '#org-repositories-list',
+      "#user-repositories-list",
+      "#org-repositories-list",
       '[data-testid="repository-list-container"]',
       'div[data-test-selector="org-repositories-list"]',
-      'main[role="main"]'
+      'main[role="main"]',
     ];
 
-    targetSelectors.forEach(selector => {
+    targetSelectors.forEach((selector) => {
       const element = document.querySelector(selector);
       if (element) {
         this.observer.observe(element, {
           childList: true,
-          subtree: true
+          subtree: true,
         });
       }
     });
@@ -153,26 +163,25 @@ class GitHubGitLabTheme {
 
     try {
       this.themeManager.applyDarkTheme();
-      
+
       const containers = this.repositoryFinder.findRepositoryContainers();
-      
-      containers.forEach(container => {
+
+      containers.forEach((container) => {
         const items = this.repositoryFinder.findRepositoryItems(container);
-        
+
         if (items.length > 0) {
-          if (!container.dataset.gitlabProcessed) {
+          if (!container.dataset.githubProcessed) {
             if (this.groupingEnabled && this.groupManager) {
               this.repositoryProcessor.createGroupCards(container, items);
             } else {
               this.repositoryProcessor.displayAllRepos(container, items);
             }
-            container.dataset.gitlabProcessed = 'true';
+            container.dataset.githubProcessed = "true";
           }
         }
       });
-
     } catch (e) {
-      console.error('[GitHubGitLabTheme] Error processing repositories:', e);
+      console.error("[GithubExplorer] Error processing repositories:", e);
     } finally {
       this.isProcessing = false;
     }
@@ -182,25 +191,30 @@ class GitHubGitLabTheme {
    * Add group controls to the page.
    */
   addGroupControls() {
-    const existingControls = document.querySelector('.gitlab-group-controls');
+    const existingControls = document.querySelector(".github-group-controls");
     if (existingControls) return;
 
     const repoSections = [
-      '#user-repositories-list',
-      '#org-repositories-list',
+      "#user-repositories-list",
+      "#org-repositories-list",
       '[data-testid="repository-list-container"]',
       'div[data-test-selector="org-repositories-list"]',
-      '.org-repos',
-      '#org-repositories'
+      ".org-repos",
+      "#org-repositories",
     ];
 
     for (const selector of repoSections) {
       const container = document.querySelector(selector);
-      if (container && !container.previousElementSibling?.classList.contains('gitlab-group-controls')) {
+      if (
+        container &&
+        !container.previousElementSibling?.classList.contains(
+          "github-group-controls",
+        )
+      ) {
         const controls = new GroupControls(
           this.handleToggleGrouping.bind(this),
           this.showGroupManager.bind(this),
-          this.groupingEnabled
+          this.groupingEnabled,
         );
         container.parentNode.insertBefore(controls.create(), container);
         break;
@@ -214,7 +228,7 @@ class GitHubGitLabTheme {
    */
   handleToggleGrouping(enabled) {
     this.groupingEnabled = enabled;
-    this.saveSetting('groupingEnabled', enabled);
+    this.saveSetting("groupingEnabled", enabled);
     this.repositoryFinder.clearProcessedCache();
     this.processRepositories();
   }
@@ -226,7 +240,7 @@ class GitHubGitLabTheme {
     const modal = new GroupManagerModal(
       this.customGroups,
       this.handleAddGroup.bind(this),
-      this.handleRemoveGroup.bind(this)
+      this.handleRemoveGroup.bind(this),
     );
     modal.show();
   }
@@ -238,11 +252,11 @@ class GitHubGitLabTheme {
   async handleAddGroup(groupName) {
     this.customGroups.add(groupName);
     await this.saveCustomGroups();
-    
+
     if (this.groupManager) {
       this.groupManager.updateCustomGroups(this.customGroups);
     }
-    
+
     this.repositoryFinder.clearProcessedCache();
     this.processRepositories();
   }
@@ -254,11 +268,11 @@ class GitHubGitLabTheme {
   async handleRemoveGroup(groupName) {
     this.customGroups.delete(groupName);
     await this.saveCustomGroups();
-    
+
     if (this.groupManager) {
       this.groupManager.updateCustomGroups(this.customGroups);
     }
-    
+
     this.repositoryFinder.clearProcessedCache();
     this.processRepositories();
   }
@@ -267,7 +281,10 @@ class GitHubGitLabTheme {
    * Save custom groups to storage.
    */
   async saveCustomGroups() {
-    await this.storage.saveSetting('customGroups', Array.from(this.customGroups));
+    await this.storage.saveSetting(
+      "customGroups",
+      Array.from(this.customGroups),
+    );
   }
 
   /**
@@ -285,19 +302,27 @@ class GitHubGitLabTheme {
    * @param {Element} card - Group card element.
    */
   showGroupRepos(groupId, card) {
-    const groupedContainer = card.closest('.gitlab-grouped-repositories') || 
-                          card.parentElement.closest('.gitlab-grouped-repositories') ||
-                          document.querySelector('.gitlab-grouped-repositories');
-    
-    console.log(`[GitHubGitLabTheme] Showing repos for group: ${groupId}`);
-    
+    const groupedContainer =
+      card.closest(".github-grouped-repositories") ||
+      card.parentElement.closest(".github-grouped-repositories") ||
+      document.querySelector(".github-grouped-repositories");
+
+    console.log(`[GithubExplorer] Showing repos for group: ${groupId}`);
+
     if (groupedContainer) {
       this.groupDisplayManager.showGroupRepos(groupId, groupedContainer);
     } else {
-      console.error(`[GitHubGitLabTheme] Could not find grouped repositories container`);
-      const allGroupedContainers = document.querySelectorAll('.gitlab-grouped-repositories');
+      console.error(
+        `[GithubExplorer] Could not find grouped repositories container`,
+      );
+      const allGroupedContainers = document.querySelectorAll(
+        ".github-grouped-repositories",
+      );
       if (allGroupedContainers.length > 0) {
-        this.groupDisplayManager.showGroupRepos(groupId, allGroupedContainers[0]);
+        this.groupDisplayManager.showGroupRepos(
+          groupId,
+          allGroupedContainers[0],
+        );
       }
     }
   }
@@ -306,7 +331,7 @@ class GitHubGitLabTheme {
    * Handle navigation changes.
    */
   handleNavigationChange() {
-    console.log('[GitHubGitLabTheme] Handling navigation change');
+    console.log("[GithubExplorer] Handling navigation change");
     this.repositoryFinder.clearProcessedCache();
     this.run();
   }
@@ -324,8 +349,8 @@ class GitHubGitLabTheme {
   }
 }
 
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = GitHubGitLabTheme;
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = GithubExplorer;
 } else {
-  new GitHubGitLabTheme();
+  new GithubExplorer();
 }

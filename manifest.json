@@ -1,27 +1,15 @@
 {
   "manifest_version": 3,
-  "name": "GitHub GitLab Dark Theme & Groups",
-  "version": "3.0.0",
-  "description": "Transform GitHub to GitLab's dark theme with intelligent repository grouping and dropdown management",
-  "permissions": [
-    "activeTab",
-    "storage"
-  ],
-  "host_permissions": [
-    "https://github.com/*"
-  ],
+  "name": "GitHub Explorer2",
+  "version": "1.0.0",
+  "description": "Transforms GitHub with intelligent repository grouping and card-based management",
+  "permissions": ["activeTab", "storage"],
+  "host_permissions": ["https://github.com/*"],
   "content_scripts": [
     {
-      "matches": [
-        "https://github.com/*"
-      ],
-      "css": [
-        "styles.css"
-      ],
-"js": [
-        "node_modules/dexie/dist/dexie.min.js",
-        "src/main.js"
-      ],
+      "matches": ["https://github.com/*"],
+      "css": ["public/styles.css"],
+      "js": ["node_modules/dexie/dist/dexie.min.js", "src/main.js"],
       "type": "module",
       "run_at": "document_idle"
     }
@@ -33,8 +21,8 @@
     }
   ],
   "icons": {
-    "16": "assets/github-explorer.png",
-    "48": "assets/github-explorer.png",
-    "128": "assets/github-explorer.png"
+    "16": "public/assets/github-explorer.png",
+    "48": "public/assets/github-explorer.png",
+    "128": "public/assets/github-explorer.png"
   }
 }
