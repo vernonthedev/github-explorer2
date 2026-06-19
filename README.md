@@ -62,6 +62,8 @@ Once installed, the extension automatically:
 
 [![Star History Chart](https://api.star-history.com/svg?repos=vernonthedev/github-explorer2&type=date&legend=top-left)](https://www.star-history.com/#vernonthedev/github-explorer2&type=date&legend=top-left)
 
+![Alt](https://repobeats.axiom.co/api/embed/40dc572aae96065261c75036d2352093e7ffdd14.svg "Repobeats analytics image")
+
 ---
 
 Made with ❤️ by [vernonthedev](https://github.com/vernonthedev)
